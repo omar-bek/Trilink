@@ -296,7 +296,7 @@ export const GovernmentAuditPortal = () => {
                         <Typography variant="body2">
                           {formatDateTime(log.timestamp)}
                         </Typography>
-                        {log.timestampHash && (
+                        {log.timestamp && (
                           <Tooltip title="Cryptographically timestamped">
                             <Chip
                               label="Verified"
@@ -476,11 +476,11 @@ export const GovernmentAuditPortal = () => {
                 <Typography variant="body1">
                   {formatDateTime(selectedLog.timestamp)} (ISO 8601: {new Date(selectedLog.timestamp).toISOString()})
                 </Typography>
-                {selectedLog.timestampHash && (
+                {selectedLog.timestamp && (
                   <Alert severity="success" sx={{ mt: 1 }}>
                     <Typography variant="body2">
                       <strong>Cryptographically Timestamped:</strong> This log entry has been cryptographically
-                      timestamped and is immutable. Hash: {selectedLog.timestampHash.substring(0, 32)}...
+                      timestamped and is immutable. Hash: {selectedLog.timestamp.substring(0, 32)}...
                     </Typography>
                   </Alert>
                 )}

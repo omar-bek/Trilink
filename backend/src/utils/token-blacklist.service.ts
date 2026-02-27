@@ -7,7 +7,7 @@
 import { createClient, RedisClientType } from 'redis';
 import { config } from '../config/env';
 import { logger } from './logger';
-import { decodeToken, JWTPayload } from './jwt';
+import { decodeToken } from './jwt';
 import crypto from 'crypto';
 
 export class TokenBlacklistService {
@@ -82,7 +82,7 @@ export class TokenBlacklistService {
           },
         });
 
-        this.redis.on('error', (err) => {
+        this.redis.on('error', (_err) => {
           // Throttle error logging
           const now = Date.now();
           if (now - this.lastErrorLogTime > this.ERROR_LOG_THROTTLE) {

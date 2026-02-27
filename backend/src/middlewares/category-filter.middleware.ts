@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Role } from '../config/rbac';
 import { logger } from '../utils/logger';
-import { getRequestId } from '../utils/requestId';
 import { CompanyCategoryRepository } from '../modules/company-categories/repository';
 
 /**
@@ -11,7 +10,7 @@ import { CompanyCategoryRepository } from '../modules/company-categories/reposit
  */
 export const filterByCategorySpecialization = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {

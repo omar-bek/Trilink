@@ -15,7 +15,8 @@ import { Refresh } from '@mui/icons-material';
  * - Provides refresh action
  */
 export const NetworkStatusBanner = () => {
-  const { isOffline, isApiUnreachable } = useNetworkStatus();
+  const { isOffline } = useNetworkStatus();
+  const isApiUnreachable = false; // TODO: Implement API reachability check
 
   // Don't show banner if everything is working
   if (!isOffline && !isApiUnreachable) {

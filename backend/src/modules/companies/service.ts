@@ -28,7 +28,10 @@ export class CompanyService {
     // Create company with PENDING status (default, but explicitly set for clarity)
     const company = await this.repository.create({
       ...data,
-      documents: data.documents || [],
+      documents: (data.documents || []).map(doc => ({
+        ...doc,
+        uploadedAt: new Date(),
+      })),
       status: Status.PENDING, // Companies start as pending, require admin approval
     });
 
@@ -80,18 +83,32 @@ export class CompanyService {
       throw new AppError('Only admin can change company status. Use approve/reject endpoints.', 403);
     }
 
-    // If updating registration number, check uniqueness
-    if (data.registrationNumber) {
-      const regExists = await this.repository.registrationNumberExists(
-        data.registrationNumber,
-        id
-      );
-      if (regExists) {
-        throw new AppError('Registration number already exists', 400);
+    // Prepare update data with proper types
+    const updateData: Partial<ICompany> = {};
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.email !== undefined) updateData.email = data.email;
+    if (data.phone !== undefined) updateData.phone = data.phone;
+    if (data.status !== undefined) updateData.status = data.status;
+    if (data.address !== undefined) {
+      // Only update if all required fields are provided
+      if (data.address.street && data.address.city && data.address.state && data.address.country && data.address.zipCode) {
+        updateData.address = {
+          street: data.address.street,
+          city: data.address.city,
+          state: data.address.state,
+          country: data.address.country,
+          zipCode: data.address.zipCode,
+        };
       }
     }
+    if (data.documents !== undefined) {
+      updateData.documents = data.documents.map(doc => ({
+        ...doc,
+        uploadedAt: new Date(),
+      }));
+    }
 
-    const updatedCompany = await this.repository.update(id, data);
+    const updatedCompany = await this.repository.update(id, updateData);
     if (!updatedCompany) {
       throw new AppError('Failed to update company', 500);
     }

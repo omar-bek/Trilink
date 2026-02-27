@@ -20,7 +20,7 @@ import {
 /**
  * Enhanced useQuery hook with automatic timeout and error handling
  */
-export const useStandardQuery = <TData = unknown, TError = unknown>(
+export const useStandardQuery = <TData = unknown, TError extends Error = Error>(
   options: UseQueryOptions<TData, TError> & {
     timeout?: number;
     skipOnOffline?: boolean;
@@ -45,7 +45,7 @@ export const useStandardQuery = <TData = unknown, TError = unknown>(
     ...queryOptions,
     queryFn,
     enabled,
-  });
+  }) as any;
 
   const query = useQuery<TData, TError>(standardOptions);
 
@@ -53,7 +53,7 @@ export const useStandardQuery = <TData = unknown, TError = unknown>(
   if (query.error && isPermissionError(query.error)) {
     // Permission errors should not show loading state
     // The error is already set, but ensure status is 'error'
-    if (query.status === 'pending') {
+    if (query.fetchStatus === 'fetching') {
       // This shouldn't happen, but handle it just in case
       console.warn('Permission error detected but query still pending');
     }

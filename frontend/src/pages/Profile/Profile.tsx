@@ -59,7 +59,7 @@ export const Profile = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const profile = profileData?.data;
+  const profile = (profileData as any)?.data;
 
   const {
     control: profileControl,
@@ -81,7 +81,7 @@ export const Profile = () => {
     formState: { errors: passwordErrors },
     reset: resetPassword,
   } = useForm<ChangePasswordDto>({
-    resolver: yupResolver(passwordSchema),
+    resolver: yupResolver(passwordSchema) as any,
   });
 
   // Update form when profile data loads

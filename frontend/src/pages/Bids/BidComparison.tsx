@@ -17,6 +17,7 @@ import { formatCurrency, formatDate } from '@/utils';
 import { PageSkeleton } from '@/components/LoadingSkeleton/LoadingSkeleton';
 import { ResponsiveTable, ResponsiveTableColumn } from '@/components/common';
 import { Bid } from '@/types/bid';
+import { convertAIScoreMetadata, convertBreakdown } from '@/utils/bidHelpers';
 
 export const BidComparison = () => {
   const { rfqId } = useParams<{ rfqId: string }>();
@@ -110,19 +111,7 @@ export const BidComparison = () => {
             score={bid.aiScore}
             showLabel={false}
             size="small"
-            aiMetadata={bid.aiScoreMetadata
-              ? {
-                  totalScore: bid.aiScoreMetadata.totalScore,
-                  breakdown: bid.aiScoreMetadata.breakdown,
-                  overallConfidence: bid.aiScoreMetadata.overallConfidence as 'high' | 'medium' | 'low',
-                  overallRisk: bid.aiScoreMetadata.overallRisk as 'low' | 'medium' | 'high',
-                  recommendation: bid.aiScoreMetadata.recommendation,
-                  timestamp: bid.aiScoreMetadata.timestamp
-                    ? new Date(bid.aiScoreMetadata.timestamp)
-                    : undefined,
-                  modelVersion: bid.aiScoreMetadata.modelVersion,
-                }
-              : undefined}
+            aiMetadata={convertAIScoreMetadata(bid.aiScoreMetadata)}
           />
         ) : (
           <Typography variant="body2" color="text.secondary">
@@ -270,9 +259,9 @@ export const BidComparison = () => {
                   </Typography>
                 <AIExplanationSummary
                   totalScore={bid.aiScoreMetadata!.totalScore}
-                  breakdown={bid.aiScoreMetadata!.breakdown}
-                  overallConfidence={bid.aiScoreMetadata!.overallConfidence as 'high' | 'medium' | 'low'}
-                  overallRisk={bid.aiScoreMetadata!.overallRisk as 'low' | 'medium' | 'high'}
+                  breakdown={convertBreakdown(bid.aiScoreMetadata!.breakdown)}
+                  overallConfidence={convertAIScoreMetadata(bid.aiScoreMetadata!)!.overallConfidence}
+                  overallRisk={convertAIScoreMetadata(bid.aiScoreMetadata!)!.overallRisk}
                   recommendation={bid.aiScoreMetadata!.recommendation}
                   timestamp={bid.aiScoreMetadata!.timestamp ? new Date(bid.aiScoreMetadata!.timestamp) : undefined}
                   modelVersion={bid.aiScoreMetadata!.modelVersion}

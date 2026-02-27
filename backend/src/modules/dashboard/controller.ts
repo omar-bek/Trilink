@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { DashboardService } from './service';
 import { ApiResponse } from '../../types/common';
 import { getRequestId } from '../../utils/requestId';
+import { Role } from '../../config/rbac';
 
 export class DashboardController {
   private service: DashboardService;
@@ -46,7 +47,7 @@ export class DashboardController {
       const dashboardData = await this.service.getDashboardData(
         userId,
         companyId,
-        role
+        role as Role
       );
 
       const response: ApiResponse = {

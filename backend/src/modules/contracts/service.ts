@@ -24,7 +24,6 @@ import { PurchaseRequestRepository } from '../purchase-requests/repository';
 import { BidRepository } from '../bids/repository';
 import { BidStatus } from '../bids/schema';
 import { RFQRepository } from '../rfqs/repository';
-import { RFQType } from '../rfqs/schema';
 import { Role } from '../../config/rbac';
 import mongoose from 'mongoose';
 import { logger } from '../../utils/logger';

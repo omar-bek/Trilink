@@ -19,7 +19,7 @@ export const ConfidenceIndicator = ({
     {
       label: string;
       color: ChipProps['color'];
-      icon: React.ReactNode;
+      icon: React.ReactElement;
       percentage: number;
       description: string;
     }
@@ -86,7 +86,7 @@ export const ConfidenceIndicator = ({
             <LinearProgress
               variant="determinate"
               value={percentage}
-              color={color}
+              color={color === 'default' ? 'primary' : color}
               sx={{ height: 6, borderRadius: 3 }}
             />
           </Box>

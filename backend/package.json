@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
+    "build:prod": "NODE_ENV=production tsc",
     "start": "node dist/server.js",
+    "start:prod": "NODE_ENV=production node dist/server.js",
     "seed": "ts-node src/seeds/index.ts",
     "clear-db": "ts-node src/seeds/clear-db.ts",
     "migrate:indexes": "ts-node src/scripts/migrations/add-indexes.ts",
@@ -22,7 +24,9 @@
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write \"src/**/*.{ts,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,json}\"",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "docker:build": "docker build -t trilink-backend -f Dockerfile .",
+    "docker:run": "docker run -p 3000:3000 --env-file .env.production trilink-backend"
   },
   "keywords": [
     "express",

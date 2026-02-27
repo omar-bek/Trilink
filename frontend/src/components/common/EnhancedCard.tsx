@@ -11,7 +11,7 @@
 import { Card, CardContent, CardProps, Box, Typography, SxProps, Theme } from '@mui/material';
 import { ReactNode } from 'react';
 
-export interface EnhancedCardProps extends Omit<CardProps, 'children'> {
+export interface EnhancedCardProps extends Omit<CardProps, 'children' | 'variant'> {
   title?: string;
   subtitle?: string;
   icon?: ReactNode;
@@ -83,7 +83,7 @@ export const EnhancedCard = ({
           background: 'linear-gradient(135deg, rgba(25, 118, 210, 0.1) 0%, rgba(25, 118, 210, 0.05) 100%)',
         }),
         ...sx,
-      }}
+      } as any}
     >
       {(title || subtitle || icon || headerAction) && (
         <Box

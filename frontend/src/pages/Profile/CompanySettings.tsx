@@ -52,7 +52,7 @@ export const CompanySettings = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const company = companyData?.data;
+  const company = (companyData as any)?.data;
   const readOnly = !isAdmin && !isCompanyManager;
 
   const {

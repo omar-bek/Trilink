@@ -17,6 +17,7 @@ import { RFQType } from '@/types/rfq';
 import { RFQStatus } from '@/types/rfq';
 import { ServiceType, ServiceTypeConfig } from '@/config/serviceProvider';
 import { designTokens } from '@/theme/designTokens';
+import { normalizeResponse } from '@/utils/responseHelpers';
 
 const { spacing } = designTokens;
 
@@ -36,7 +37,7 @@ export const RFQInbox = ({ serviceType, serviceConfig }: RFQInboxProps) => {
     enabled: serviceConfig.workflow.hasRFQInbox,
   });
 
-  const rfqs = rfqsData?.data || [];
+  const rfqs = normalizeResponse(rfqsData?.data);
 
   const columns: Column<any>[] = [
     {
@@ -103,11 +104,12 @@ export const RFQInbox = ({ serviceType, serviceConfig }: RFQInboxProps) => {
     setStatusFilter(newValue);
   };
 
+  const rfqsArray = Array.isArray(rfqs) ? rfqs : (rfqs as any)?.data || [];
   const statusCounts = {
-    all: rfqs.length,
-    [RFQStatus.OPEN]: rfqs.filter((r: any) => r.status === RFQStatus.OPEN).length,
-    [RFQStatus.CLOSED]: rfqs.filter((r: any) => r.status === RFQStatus.CLOSED).length,
-    [RFQStatus.DRAFT]: rfqs.filter((r: any) => r.status === RFQStatus.DRAFT).length,
+    all: rfqsArray.length,
+    [RFQStatus.OPEN]: rfqsArray.filter((r: any) => r.status === RFQStatus.OPEN).length,
+    [RFQStatus.CLOSED]: rfqsArray.filter((r: any) => r.status === RFQStatus.CLOSED).length,
+    [RFQStatus.DRAFT]: rfqsArray.filter((r: any) => r.status === RFQStatus.DRAFT).length,
   };
 
   return (

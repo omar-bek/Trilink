@@ -5,6 +5,8 @@ import { ErrorType } from './ErrorStates';
 
 interface ErrorHandlerProps {
   error: Error | unknown;
+  title?: string;
+  message?: string;
   onRetry?: () => Promise<void> | void;
   context?: string;
   cacheKey?: string;
@@ -27,6 +29,8 @@ interface ErrorHandlerProps {
  */
 export const ErrorHandler = ({
   error,
+  title,
+  message,
   onRetry,
   context,
   cacheKey,
@@ -43,6 +47,8 @@ export const ErrorHandler = ({
   const content = (
     <EnhancedErrorRecovery
       error={error}
+      title={title}
+      message={message}
       onRetry={onRetry}
       context={context}
       cacheKey={cacheKey}

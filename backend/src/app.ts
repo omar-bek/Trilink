@@ -5,7 +5,6 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import { config } from './config/env';
 import { errorHandler, notFoundHandler } from './middlewares/error.middleware';
-import { auditMiddleware } from './middlewares/audit.middleware';
 import { setupSwagger } from './config/swagger';
 import routes from './routes';
 
@@ -39,7 +38,7 @@ export const createApp = (): Express => {
   }
 
   // Health check endpoint
-  app.get('/health', (req, res) => {
+  app.get('/health', (_req, res) => {
     res.status(200).json({
       success: true,
       message: 'TriLink API is running',

@@ -212,7 +212,7 @@ export class PaymentController {
         AuditResource.PAYMENT,
         {
           resourceId: id,
-          before: { status: paymentBefore?.data?.status },
+          before: { status: paymentBefore?.status },
           after: { status: payment.status, approvedAt: payment.approvedAt },
           changes: { action: 'approve_payment', notes: data.notes },
         },
@@ -261,7 +261,7 @@ export class PaymentController {
         AuditResource.PAYMENT,
         {
           resourceId: id,
-          before: { status: paymentBefore?.data?.status },
+          before: { status: paymentBefore?.status },
           after: { status: payment.status, rejectedAt: payment.rejectedAt, rejectionReason: payment.rejectionReason },
           changes: { action: 'reject_payment', rejectionReason: data.rejectionReason },
         },
@@ -310,7 +310,7 @@ export class PaymentController {
         AuditResource.PAYMENT,
         {
           resourceId: id,
-          before: { status: paymentBefore?.data?.status },
+          before: { status: paymentBefore?.status },
           after: { status: payment.status, paymentMethod: payment.paymentMethod, gateway: payment.gateway },
           changes: { action: 'process_payment', paymentMethod: data.paymentMethod, gateway: data.gateway },
         },
@@ -374,8 +374,8 @@ export class PaymentController {
         {
           resourceId: id,
           before: {
-            paidDate: paymentBefore?.data?.paidDate,
-            notes: paymentBefore?.data?.notes,
+            paidDate: paymentBefore?.paidDate,
+            notes: paymentBefore?.notes,
           },
           after: {
             paidDate: payment.paidDate,
@@ -442,7 +442,7 @@ export class PaymentController {
         AuditResource.PAYMENT,
         {
           resourceId: id,
-          before: { status: paymentBefore?.data?.status },
+          before: { status: paymentBefore?.status },
           after: { status: payment.status, retryCount: payment.retryCount },
           changes: { action: 'retry_payment', retryCount: payment.retryCount },
         },
@@ -505,7 +505,7 @@ export class PaymentController {
         AuditResource.PAYMENT,
         {
           resourceId: id,
-          before: { paymentMethod: paymentBefore?.data?.paymentMethod, gateway: paymentBefore?.data?.gateway },
+          before: { paymentMethod: paymentBefore?.paymentMethod, gateway: paymentBefore?.gateway },
           after: { paymentMethod: payment.paymentMethod, gateway: payment.gateway },
           changes: { action: 'update_payment_method', paymentMethod: data.paymentMethod, gateway: data.gateway },
         },
@@ -568,9 +568,9 @@ export class PaymentController {
         {
           resourceId: id,
           before: {
-            milestone: paymentBefore?.data?.milestone,
-            amount: paymentBefore?.data?.amount,
-            status: paymentBefore?.data?.status,
+            milestone: paymentBefore?.milestone,
+            amount: paymentBefore?.amount,
+            status: paymentBefore?.status,
           },
           changes: { action: 'delete_payment' },
         },
@@ -610,7 +610,7 @@ export class PaymentController {
   handleStripeWebhook = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    _next: NextFunction
   ): Promise<void> => {
     try {
       const signature = (req as any).webhookSignature || req.headers['stripe-signature'] as string;
@@ -636,7 +636,7 @@ export class PaymentController {
   handlePayPalWebhook = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    _next: NextFunction
   ): Promise<void> => {
     try {
       const signature = (req as any).webhookSignature || req.headers['paypal-transmission-sig'] as string;

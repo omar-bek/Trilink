@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react';
+import React from 'react';
 import { env } from './env';
 
 /**
@@ -32,7 +33,16 @@ export const initSentry = () => {
     release: env.appVersion,
     integrations: [
       // React Router integration for better error context
-      Sentry.reactRouterV6BrowserTracingIntegration(),
+      Sentry.reactRouterV6BrowserTracingIntegration({
+        useEffect: React.useEffect,
+        useLocation: () => {
+          // Will be provided by React Router context
+          return { pathname: window.location.pathname, search: '', hash: '', state: null };
+        },
+        useNavigationType: () => 'POP' as any,
+        createRoutesFromChildren: (children: any) => children,
+        matchRoutes: () => [],
+      } as any),
       // Capture unhandled promise rejections
       Sentry.captureConsoleIntegration({
         levels: ['error'],

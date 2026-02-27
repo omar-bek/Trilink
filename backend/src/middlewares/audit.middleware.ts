@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
 import { AuditLogRepository } from '../modules/audit/repository';
 import { AuditAction, AuditResource } from '../modules/audit/schema';
 import { getRequestId } from '../utils/requestId';
@@ -81,6 +82,11 @@ export const auditMiddleware = async (
 
   // Capture response
   res.send = function (body: unknown) {
+    // Skip if user is not authenticated (double check)
+    if (!req.user) {
+      return originalSend.call(this, body);
+    }
+
     const duration = Date.now() - startTime;
     const status = res.statusCode >= 200 && res.statusCode < 300 ? 'success' : 'failure';
 
@@ -93,17 +99,19 @@ export const auditMiddleware = async (
 
     // Prepare audit log data
     const auditData = {
-      userId: req.user.userId,
-      companyId: req.user.companyId,
+      userId: new mongoose.Types.ObjectId(req.user.userId),
+      companyId: req.user.companyId ? new mongoose.Types.ObjectId(req.user.companyId) : undefined,
       action,
       resource: resource || AuditResource.USER, // Default to USER if not found
-      resourceId: resourceId ? resourceId : undefined,
+      resourceId: resourceId ? new mongoose.Types.ObjectId(resourceId) : undefined,
       details: {
-        method: req.method,
-        path: req.path,
-        statusCode: res.statusCode,
-        duration,
-        query: Object.keys(req.query).length > 0 ? req.query : undefined,
+        changes: {
+          method: req.method,
+          path: req.path,
+          statusCode: res.statusCode,
+          duration,
+          query: Object.keys(req.query).length > 0 ? req.query : undefined,
+        },
       },
       ipAddress: req.ip || req.socket.remoteAddress,
       userAgent: req.get('user-agent'),

@@ -4,7 +4,7 @@ import { PaymentGateway } from './types';
 import { logger } from '../../../utils/logger';
 
 export class PayPalGateway implements IPaymentGateway {
-  private client: paypal.core.PayPalHttpClient;
+  private client: InstanceType<typeof paypal.core.PayPalHttpClient>;
 
   constructor(clientId: string, clientSecret: string, environment: 'sandbox' | 'production' = 'sandbox') {
     if (!clientId || !clientSecret) {
@@ -78,7 +78,7 @@ export class PayPalGateway implements IPaymentGateway {
    * Verify webhook signature
    */
   verifyWebhookSignature(
-    payload: string | Buffer,
+    _payload: string | Buffer,
     signature: string,
     secret: string
   ): boolean {

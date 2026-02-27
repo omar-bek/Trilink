@@ -5,7 +5,6 @@
  */
 
 import crypto from 'crypto';
-import { logger } from './logger';
 import { getPKIService } from './pki.service';
 
 export interface TimestampData {

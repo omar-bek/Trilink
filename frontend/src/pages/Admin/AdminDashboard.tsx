@@ -43,7 +43,7 @@ export const AdminDashboard = () => {
   const { data: usersData, isLoading: isLoadingUsers } = useAllUsers();
   const { data: companiesData, isLoading: isLoadingCompanies } = useCompanies();
 
-  const kpis = dashboardData?.data?.kpis || dashboardData?.data?.data?.kpis || {};
+  const kpis = (dashboardData as any)?.data?.kpis || (dashboardData as any)?.data?.data?.kpis || {};
   const users = usersData?.data || [];
   const companies = companiesData?.data || [];
 

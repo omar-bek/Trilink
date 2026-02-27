@@ -12,9 +12,9 @@ export class EmailService {
   private useSendGrid: boolean;
 
   constructor() {
-    this.sendGridApiKey = config.SENDGRID_API_KEY;
-    this.fromEmail = config.EMAIL_FROM || 'noreply@trilink.com';
-    this.fromName = config.EMAIL_FROM_NAME || 'TriLink Platform';
+    this.sendGridApiKey = config.email.sendGridApiKey;
+    this.fromEmail = config.email.from || 'noreply@trilink.com';
+    this.fromName = config.email.fromName || 'TriLink Platform';
     this.useSendGrid = !!this.sendGridApiKey;
 
     // Initialize SendGrid if API key is provided
@@ -30,13 +30,13 @@ export class EmailService {
 
   private initializeNodemailer() {
     const smtpConfig = {
-      host: config.SMTP_HOST || 'smtp.gmail.com',
-      port: parseInt(config.SMTP_PORT || '587'),
-      secure: config.SMTP_SECURE === 'true', // true for 465, false for other ports
-      auth: config.SMTP_USER && config.SMTP_PASS
+      host: config.email.smtp.host || 'smtp.gmail.com',
+      port: parseInt(config.email.smtp.port || '587'),
+      secure: config.email.smtp.secure, // true for 465, false for other ports
+      auth: config.email.smtp.user && config.email.smtp.pass
         ? {
-            user: config.SMTP_USER,
-            pass: config.SMTP_PASS,
+            user: config.email.smtp.user,
+            pass: config.email.smtp.pass,
           }
         : undefined,
     };

@@ -15,3 +15,9 @@ export type { StatsCardProps } from './StatsCard';
 
 export { ResponsiveTable } from './ResponsiveTable';
 export type { ResponsiveTableColumn, ResponsiveTableProps } from './ResponsiveTable';
+
+export { EnterpriseCard } from './EnterpriseCard';
+export type { EnterpriseCardProps } from './EnterpriseCard';
+
+export { StatusBadge } from './StatusBadge';
+export type { StatusType, StatusBadgeProps } from './StatusBadge';

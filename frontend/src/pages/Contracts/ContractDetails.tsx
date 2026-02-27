@@ -126,7 +126,7 @@ export const ContractDetails = () => {
     reset: resetAmendment,
     formState: { errors: amendmentErrors },
   } = useForm<CreateAmendmentDto>({
-    resolver: yupResolver(amendmentSchema),
+    resolver: yupResolver(amendmentSchema) as any,
     defaultValues: {
       reason: '',
       description: '',

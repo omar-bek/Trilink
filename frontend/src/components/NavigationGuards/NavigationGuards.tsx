@@ -52,7 +52,7 @@ export const NavigationGuard = ({
     const navItem = findNavigationItemByPath(location.pathname);
     if (navItem && navItem.roles) {
       // Admin can access everything
-      if (userRole !== Role.ADMIN && !navItem.roles.includes(userRole)) {
+      if ((userRole as any) !== Role.ADMIN && !navItem.roles.includes(userRole)) {
         navigate('/unauthorized', { replace: true });
         return;
       }

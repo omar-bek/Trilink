@@ -2,8 +2,8 @@ import api from './api';
 import { ApiResponse, PaginatedResponse } from '@/types';
 import { Bid, CreateBidDto, UpdateBidDto, EvaluateBidDto, BidFilters } from '@/types/bid';
 
-// Re-export from utils for convenience
-export type { PaginationParams } from '@/utils/pagination';
+// Import PaginationParams type
+import type { PaginationParams } from '@/utils/pagination';
 
 export const bidService = {
   getBids: async (

@@ -8,7 +8,7 @@ import { raw } from 'express';
  */
 export const rawBodyMiddleware = raw({ 
   type: 'application/json',
-  verify: (req: any, res, buf) => {
+  verify: (req: any, _res, buf) => {
     // Store raw body for signature verification
     req.rawBody = buf.toString('utf8');
   }
@@ -19,7 +19,7 @@ export const rawBodyMiddleware = raw({
  */
 export const extractWebhookSignature = (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void => {
   // Stripe webhook signature

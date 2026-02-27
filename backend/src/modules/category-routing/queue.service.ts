@@ -90,7 +90,8 @@ export class CategoryRoutingQueueService {
 
         // Pop from queue (blocking with timeout)
         const result = await redis.brPop(
-          { key: 'category:routing:queue', timeout: 5 },
+          'category:routing:queue',
+          5
         );
 
         if (result && result.element) {

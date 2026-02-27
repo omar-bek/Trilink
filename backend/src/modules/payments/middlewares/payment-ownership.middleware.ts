@@ -3,6 +3,7 @@ import { Role } from '../../../config/rbac';
 import { logger } from '../../../utils/logger';
 import { getRequestId } from '../../../utils/requestId';
 import { PaymentRepository } from '../repository';
+import mongoose from 'mongoose';
 
 /**
  * Payment Ownership Middleware
@@ -92,13 +93,13 @@ export const requirePaymentOwnership = () => {
       const paymentRecipientCompanyId = payment.recipientCompanyId;
       
       // Extract ID string - handle both ObjectId and populated objects
-      const paymentCompanyIdStr = typeof paymentCompanyId === 'object' && paymentCompanyId !== null && '_id' in paymentCompanyId
+      const paymentCompanyIdStr = (paymentCompanyId && typeof paymentCompanyId === 'object' && '_id' in paymentCompanyId)
         ? (paymentCompanyId as any)._id.toString()
-        : paymentCompanyId.toString();
+        : (paymentCompanyId as mongoose.Types.ObjectId).toString();
       
-      const paymentRecipientCompanyIdStr = typeof paymentRecipientCompanyId === 'object' && paymentRecipientCompanyId !== null && '_id' in paymentRecipientCompanyId
+      const paymentRecipientCompanyIdStr = (paymentRecipientCompanyId && typeof paymentRecipientCompanyId === 'object' && '_id' in paymentRecipientCompanyId)
         ? (paymentRecipientCompanyId as any)._id.toString()
-        : paymentRecipientCompanyId.toString();
+        : (paymentRecipientCompanyId as mongoose.Types.ObjectId).toString();
       
       const userCompanyIdStr = userCompanyId.toString();
 

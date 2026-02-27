@@ -145,7 +145,7 @@ export const filterByCompany = (
  * @param idParam - Name of the parameter containing the resource ID (default: 'id')
  * @param companyIdField - Name of the field containing companyId in the resource (default: 'companyId')
  */
-export const requireResourceOwnership = <T extends { companyId?: string }>(
+export const requireResourceOwnership = <T extends { [key: string]: any }>(
   fetchResource: (id: string) => Promise<T | null>,
   idParam: string = 'id',
   companyIdField: string = 'companyId'

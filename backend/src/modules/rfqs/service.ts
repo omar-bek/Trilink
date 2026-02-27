@@ -12,6 +12,7 @@ import { PaginatedResponse } from '../../types/common';
 import { parsePaginationQuery, createPaginationResult, buildSortObject } from '../../utils/pagination';
 import { notificationService, NotificationEvent } from '../notifications';
 import { notificationHelpers } from '../notifications/helpers';
+import { EmailRecipient } from '../notifications/types';
 import { logger } from '../../utils/logger';
 import mongoose from 'mongoose';
 
@@ -70,7 +71,8 @@ export class RFQService {
 
     const rfq = await this.repository.create({
       ...data,
-      companyId,
+      purchaseRequestId: new mongoose.Types.ObjectId(data.purchaseRequestId),
+      companyId: new mongoose.Types.ObjectId(companyId),
       targetCompanyIds,
       requiredDeliveryDate: new Date(data.requiredDeliveryDate),
       deadline: new Date(data.deadline),
@@ -79,7 +81,7 @@ export class RFQService {
 
     // Send notification to specific companies or target role users about new RFQ
     try {
-      let recipients: Array<{ email: string; name: string }> = [];
+      let recipients: EmailRecipient[] = [];
       
       if (targetCompanyIds && targetCompanyIds.length > 0) {
         // Send to specific companies
@@ -87,11 +89,18 @@ export class RFQService {
           const companyRecipients = await notificationHelpers.getRecipientsByCompany(
             companyId.toString()
           );
-          recipients.push(...companyRecipients);
+          recipients.push(...companyRecipients.map(r => ({
+            email: r.email,
+            name: r.name || r.email,
+          })));
         }
       } else {
         // Fall back to role-based notification
-        recipients = await notificationHelpers.getRecipientsByRole(rfq.targetRole);
+        const roleRecipients = await notificationHelpers.getRecipientsByRole(rfq.targetRole);
+        recipients = roleRecipients.map(r => ({
+          email: r.email,
+          name: r.name || r.email,
+        }));
       }
 
       if (recipients.length > 0) {
@@ -376,7 +385,12 @@ export class RFQService {
       throw new AppError('RFQ not found', 404);
     }
 
-    const updateData: Partial<IRFQ> = { ...data };
+    const updateData: Partial<IRFQ> = {};
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.items !== undefined) updateData.items = data.items;
+    if (data.budget !== undefined) updateData.budget = data.budget;
+    if (data.status !== undefined) updateData.status = data.status;
     if (data.deadline) {
       updateData.deadline = new Date(data.deadline);
     }

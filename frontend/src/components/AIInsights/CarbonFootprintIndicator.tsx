@@ -17,7 +17,7 @@ import {
   Divider,
 } from '@mui/material';
 import {
-  Eco,
+  LocalFlorist as Eco,
   TrendingDown,
   TrendingUp,
   Info,

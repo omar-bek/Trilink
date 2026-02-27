@@ -72,7 +72,7 @@ export const CategoryManagement = () => {
         reset: resetCreate,
         formState: { errors: createErrors },
     } = useForm<CreateCategoryDto>({
-        resolver: yupResolver(createCategorySchema),
+        resolver: yupResolver(createCategorySchema) as any,
         defaultValues: {
             name: '',
             nameAr: '',

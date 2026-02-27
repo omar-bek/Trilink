@@ -26,7 +26,7 @@ import {
   Security,
 } from '@mui/icons-material';
 import { Contract } from '@/types/contract';
-import { api } from '@/services/api';
+import api from '@/services/api';
 
 interface SignatureVerificationProps {
   contract: Contract;
@@ -106,7 +106,7 @@ export const SignatureVerification = ({ contract }: SignatureVerificationProps) 
         </Typography>
 
         {contract.signatures.map((signature, index) => {
-          const signatureId = signature._id || `sig-${index}`;
+          const signatureId = (signature as any)._id || `sig-${index}`;
           const result = verificationResults[signatureId];
           const isValid = result?.valid === true;
           const isVerified = signature.verified === true;

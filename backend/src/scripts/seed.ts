@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import { config } from '../config/env';
 import { connectDatabase } from '../config/database';
 import { User } from '../modules/users/schema';
@@ -107,7 +106,7 @@ const seed = async (): Promise<void> => {
     const hashedPassword = await bcrypt.hash('Password123!', config.security.bcryptRounds);
 
     // Create Admin User
-    const adminUser = await User.create({
+    await User.create({
       email: 'admin@trilink.ae',
       password: hashedPassword,
       role: Role.ADMIN,
@@ -119,7 +118,7 @@ const seed = async (): Promise<void> => {
     });
 
     // Create Buyer User
-    const buyerUser = await User.create({
+    await User.create({
       email: 'buyer@uae.gov.ae',
       password: hashedPassword,
       role: Role.BUYER,
@@ -131,7 +130,7 @@ const seed = async (): Promise<void> => {
     });
 
     // Create Supplier User
-    const supplierUser = await User.create({
+    await User.create({
       email: 'supplier@techsupplies.ae',
       password: hashedPassword,
       role: Role.SUPPLIER,
@@ -143,7 +142,7 @@ const seed = async (): Promise<void> => {
     });
 
     // Create Logistics User
-    const logisticsUser = await User.create({
+    await User.create({
       email: 'logistics@fastlogistics.ae',
       password: hashedPassword,
       role: Role.LOGISTICS,
@@ -155,7 +154,7 @@ const seed = async (): Promise<void> => {
     });
 
     // Create Clearance User
-    const clearanceUser = await User.create({
+    await User.create({
       email: 'clearance@clearance.ae',
       password: hashedPassword,
       role: Role.CLEARANCE,
@@ -167,7 +166,7 @@ const seed = async (): Promise<void> => {
     });
 
     // Create Government User
-    const governmentUser = await User.create({
+    await User.create({
       email: 'government@uae.gov.ae',
       password: hashedPassword,
       role: Role.GOVERNMENT,

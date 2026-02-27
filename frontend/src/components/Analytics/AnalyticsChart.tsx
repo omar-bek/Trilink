@@ -72,9 +72,9 @@ export const AnalyticsChart = ({
 
   // Format data for recharts
   const chartData = data.map((item) => ({
-    name: item.label || item.name || '',
-    value: item.value || 0,
     ...item,
+    name: item.label || item.name || item.name || '',
+    value: item.value || 0,
   }));
 
   const renderChart = () => {
@@ -169,7 +169,7 @@ export const AnalyticsChart = ({
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
                 outerRadius={80}
                 fill={colors.intelligence.cerulean}
                 dataKey="value"

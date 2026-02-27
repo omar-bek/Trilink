@@ -5,6 +5,7 @@
  * Supports modular, configurable service dashboards
  */
 
+import React from 'react';
 import {
   Inventory,
   VerifiedUser,

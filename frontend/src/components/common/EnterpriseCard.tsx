@@ -11,7 +11,7 @@ import { designTokens } from '@/theme/designTokens';
 
 const { colors, spacing, borders, shadows } = designTokens;
 
-interface EnterpriseCardProps extends Omit<CardProps, 'title'> {
+export interface EnterpriseCardProps extends Omit<CardProps, 'title' | 'variant'> {
   title?: ReactNode;
   subtitle?: ReactNode;
   action?: ReactNode;

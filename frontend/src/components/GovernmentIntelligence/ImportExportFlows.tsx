@@ -42,7 +42,7 @@ export const ImportExportFlows = ({ timeRange }: ImportExportFlowsProps) => {
         <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem' }}>
           Import/Export Trade Flows
         </Typography>
-        <Tabs value={viewMode} onChange={(_, v) => setViewMode(v)} size="small">
+        <Tabs value={viewMode} onChange={(_, v) => setViewMode(v)}>
           <Tab label="Charts" icon={<ShowChart fontSize="small" />} iconPosition="start" />
           <Tab label="Map View" icon={<Map fontSize="small" />} iconPosition="start" />
         </Tabs>

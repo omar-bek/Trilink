@@ -347,7 +347,7 @@ export class ContractController {
       const requesterRole = req.user.role as Role;
       
       // Verify contract exists and user has access (buyer OR party)
-      const contract = await this.service.getContractById(
+      await this.service.getContractById(
         id,
         requesterCompanyId,
         requesterRole

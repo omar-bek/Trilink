@@ -164,7 +164,7 @@ export class ErrorBoundary extends Component<Props, State> {
 export const SentryErrorBoundary = Sentry.withErrorBoundary(ErrorBoundary, {
   fallback: ({ error }) => (
     <ErrorBoundary>
-      <div>An error occurred: {error.message}</div>
+      <div>An error occurred: {error instanceof Error ? error.message : String(error)}</div>
     </ErrorBoundary>
   ),
   showDialog: true,

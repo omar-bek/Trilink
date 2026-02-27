@@ -46,7 +46,7 @@ export class ShipmentService {
     // Create shipment
     const shipment = await this.repository.create({
       ...data,
-      companyId,
+      companyId: new mongoose.Types.ObjectId(companyId),
       contractId: new mongoose.Types.ObjectId(data.contractId),
       logisticsCompanyId: new mongoose.Types.ObjectId(data.logisticsCompanyId),
       estimatedDeliveryDate: new Date(data.estimatedDeliveryDate),

@@ -147,7 +147,7 @@ export const requireRole = (...roles: Role[]) => {
       const userRole = req.user.role as Role;
 
       // Admin bypasses all role restrictions
-      if (userRole === Role.ADMIN || userRole === 'Admin') {
+      if (userRole === Role.ADMIN) {
         next();
         return;
       }

@@ -97,10 +97,10 @@ export const SignatureFlow = ({ contract }: SignatureFlowProps) => {
           id: contractId,
           data: {
             signature: signingResult.signature,
-            certificate: signingResult.certificate,
-            algorithm: signingResult.algorithm,
-            timestamp: signingResult.timestamp,
-          },
+            ...(signingResult.certificate && { certificate: signingResult.certificate } as any),
+            ...(signingResult.algorithm && { algorithm: signingResult.algorithm } as any),
+            ...(signingResult.timestamp && { timestamp: signingResult.timestamp } as any),
+          } as any,
         },
         {
           onSuccess: (data) => {

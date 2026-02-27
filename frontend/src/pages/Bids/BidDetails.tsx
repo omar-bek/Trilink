@@ -46,6 +46,7 @@ import { ActivityHistory } from '@/components/Audit/ActivityHistory';
 import { formatCurrency, formatDate, formatDateTime, isValidId } from '@/utils';
 import { calculateVAT } from '@/utils/vat';
 import { PageSkeleton } from '@/components/LoadingSkeleton/LoadingSkeleton';
+import { convertAIScoreMetadata, convertBreakdown } from '@/utils/bidHelpers';
 import { BidStatus } from '@/types/bid';
 import { ContractStatus } from '@/types/contract';
 import { useAuthStore } from '@/store/auth.store';
@@ -181,7 +182,7 @@ export const BidDetails = () => {
   const handleWorkflowAction = (action: string) => {
     if (action === 'submit' && validId) {
       updateMutation.mutate(
-        { id: validId, data: { status: BidStatus.SUBMITTED } },
+        { id: validId, data: { status: BidStatus.SUBMITTED } as any },
         {
           onSuccess: () => {
             // Query will be invalidated automatically
@@ -209,15 +210,7 @@ export const BidDetails = () => {
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <AIScoreIndicator
                   score={bid.aiScore}
-                  aiMetadata={bid.aiScoreMetadata ? {
-                    totalScore: bid.aiScoreMetadata.totalScore,
-                    breakdown: bid.aiScoreMetadata.breakdown,
-                    overallConfidence: bid.aiScoreMetadata.overallConfidence as 'high' | 'medium' | 'low',
-                    overallRisk: bid.aiScoreMetadata.overallRisk as 'low' | 'medium' | 'high',
-                    recommendation: bid.aiScoreMetadata.recommendation,
-                    timestamp: bid.aiScoreMetadata.timestamp ? new Date(bid.aiScoreMetadata.timestamp) : undefined,
-                    modelVersion: bid.aiScoreMetadata.modelVersion,
-                  } : undefined}
+                  aiMetadata={convertAIScoreMetadata(bid.aiScoreMetadata)}
                 />
               </Box>
             ) : null}
@@ -370,6 +363,7 @@ export const BidDetails = () => {
       {bid.status === BidStatus.REJECTED && isProvider && (
         <WorkflowNextSteps
           title="Bid Rejected"
+          steps={[]}
           completed={true}
           completedMessage="This bid has been rejected by the buyer."
         />
@@ -615,31 +609,39 @@ export const BidDetails = () => {
           {/* AI Score Explanation - Comprehensive & Audit-Safe */}
           {bid.aiScoreMetadata && (
             <>
-              <AIExplanationSummary
-                totalScore={bid.aiScoreMetadata.totalScore}
-                breakdown={bid.aiScoreMetadata.breakdown}
-                overallConfidence={bid.aiScoreMetadata.overallConfidence as 'high' | 'medium' | 'low'}
-                overallRisk={bid.aiScoreMetadata.overallRisk as 'low' | 'medium' | 'high'}
-                recommendation={bid.aiScoreMetadata.recommendation}
-                timestamp={bid.aiScoreMetadata.timestamp ? new Date(bid.aiScoreMetadata.timestamp) : undefined}
-                modelVersion={bid.aiScoreMetadata.modelVersion}
-                variant="detailed"
-                showDisclaimer={true}
-                showModelInfo={true}
-              />
-              <Card sx={{ mb: 3 }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-                    Detailed Score Breakdown by Factor
-                  </Typography>
-                  <AIScoreBreakdown
-                    totalScore={bid.aiScoreMetadata.totalScore}
-                    breakdown={bid.aiScoreMetadata.breakdown}
-                    overallConfidence={bid.aiScoreMetadata.overallConfidence as 'high' | 'medium' | 'low'}
-                    overallRisk={bid.aiScoreMetadata.overallRisk as 'low' | 'medium' | 'high'}
-                  />
-                </CardContent>
-              </Card>
+              {(() => {
+                const convertedMetadata = convertAIScoreMetadata(bid.aiScoreMetadata);
+                if (!convertedMetadata) return null;
+                return (
+                  <>
+                    <AIExplanationSummary
+                      totalScore={convertedMetadata.totalScore}
+                      breakdown={convertedMetadata.breakdown}
+                      overallConfidence={convertedMetadata.overallConfidence}
+                      overallRisk={convertedMetadata.overallRisk}
+                      recommendation={convertedMetadata.recommendation}
+                      timestamp={convertedMetadata.timestamp}
+                      modelVersion={convertedMetadata.modelVersion}
+                      variant="detailed"
+                      showDisclaimer={true}
+                      showModelInfo={true}
+                    />
+                    <Card sx={{ mb: 3 }}>
+                      <CardContent>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+                          Detailed Score Breakdown by Factor
+                        </Typography>
+                        <AIScoreBreakdown
+                          totalScore={convertedMetadata.totalScore}
+                          breakdown={convertedMetadata.breakdown}
+                          overallConfidence={convertedMetadata.overallConfidence}
+                          overallRisk={convertedMetadata.overallRisk}
+                        />
+                      </CardContent>
+                    </Card>
+                  </>
+                );
+              })()}
             </>
           )}
 

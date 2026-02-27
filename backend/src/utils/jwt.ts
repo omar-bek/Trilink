@@ -1,4 +1,5 @@
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
+import type { StringValue } from 'ms';
 import { config } from '../config/env';
 
 export interface JWTPayload {
@@ -12,18 +13,22 @@ export interface JWTPayload {
  * Generate JWT Access Token (15 minutes expiry)
  */
 export const generateAccessToken = (payload: JWTPayload): string => {
-  return jwt.sign(payload, config.jwt.secret, {
-    expiresIn: config.jwt.accessExpiry,
-  });
+  const secret = config.jwt.secret as string;
+  const options: SignOptions = {
+    expiresIn: config.jwt.accessExpiry as StringValue,
+  };
+  return jwt.sign(payload, secret, options);
 };
 
 /**
  * Generate JWT Refresh Token (7 days expiry)
  */
 export const generateRefreshToken = (payload: JWTPayload): string => {
-  return jwt.sign(payload, config.jwt.refreshSecret, {
-    expiresIn: config.jwt.refreshExpiry,
-  });
+  const refreshSecret = config.jwt.refreshSecret as string;
+  const options: SignOptions = {
+    expiresIn: config.jwt.refreshExpiry as StringValue,
+  };
+  return jwt.sign(payload, refreshSecret, options);
 };
 
 /**

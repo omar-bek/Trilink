@@ -1,12 +1,9 @@
-import { CompanyCategoryRepository } from '../company-categories/repository';
 import { CategoryRepository } from '../categories/repository';
 import { CompanyRepository } from '../companies/repository';
 import { Status } from '../../types/common';
 import { AppError } from '../../middlewares/error.middleware';
 import mongoose from 'mongoose';
 import { CompanyCategory } from '../company-categories/schema';
-import { Company } from '../companies/schema';
-import { Category } from '../categories/schema';
 
 export interface MatchedCompany {
   companyId: string;
@@ -24,12 +21,10 @@ export interface MatchedCompany {
    * Performance: 10-30 seconds → <500ms (20-60x faster)
    */
 export class CategoryRoutingService {
-  private companyCategoryRepository: CompanyCategoryRepository;
   private categoryRepository: CategoryRepository;
   private companyRepository: CompanyRepository;
 
   constructor() {
-    this.companyCategoryRepository = new CompanyCategoryRepository();
     this.categoryRepository = new CategoryRepository();
     this.companyRepository = new CompanyRepository();
   }

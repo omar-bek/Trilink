@@ -10,7 +10,6 @@ import {
 import { AppError } from '../../middlewares/error.middleware';
 import { IPayment, PaymentStatus } from './schema';
 import { ContractRepository } from '../contracts/repository';
-import { Role } from '../../config/rbac';
 import mongoose from 'mongoose';
 import { getSocketService } from '../../socket/socket.service';
 import { SocketEvent } from '../../socket/types';
@@ -18,6 +17,7 @@ import { logger } from '../../utils/logger';
 import { PaymentGatewayFactory } from './gateways/factory';
 import { PaymentGateway } from './gateways/types';
 import { PaginatedResponse } from '../../types/common';
+import { config } from '../../config/env';
 import { parsePaginationQuery, createPaginationResult, buildSortObject } from '../../utils/pagination';
 import { notificationService } from '../notifications/notification.service';
 import { NotificationEvent } from '../notifications/types';
@@ -68,7 +68,7 @@ export class PaymentService {
     // Create payment with PENDING_APPROVAL status
     const payment = await this.repository.create({
       ...data,
-      companyId,
+      companyId: new mongoose.Types.ObjectId(companyId),
       buyerId: new mongoose.Types.ObjectId(buyerId),
       contractId: new mongoose.Types.ObjectId(data.contractId),
       recipientCompanyId: new mongoose.Types.ObjectId(data.recipientCompanyId),
@@ -106,7 +106,7 @@ export class PaymentService {
 
     // Notify company managers about payment creation
     try {
-      const contract = await this.contractRepository.findById(payment.contractId.toString());
+      await this.contractRepository.findById(payment.contractId.toString());
       const paymentUrl = `${config.frontend.url}/payments/${payment._id}`;
 
       // Notify buyer company managers
@@ -115,7 +115,7 @@ export class PaymentService {
         NotificationEvent.PAYMENT_CREATED,
         {
           title: `New Payment Created`,
-          message: `A new payment has been created for milestone "${payment.milestone}". Amount: ${payment.currency} ${payment.totalAmount.toLocaleString()} (including VAT: ${payment.currency} ${payment.vatAmount.toLocaleString()})`,
+          message: `A new payment has been created for milestone "${payment.milestone}". Amount: ${payment.currency} ${payment.totalAmount.toLocaleString()} (including VAT: ${payment.currency} ${(payment.vatAmount || 0).toLocaleString()})`,
           entityType: 'payment',
           entityId: payment._id.toString(),
           actionUrl: paymentUrl,
@@ -688,7 +688,7 @@ export class PaymentService {
    */
   async retryPayment(
     id: string,
-    userId: string,
+    _userId: string,
     data: { paymentMethod?: string; gateway?: 'stripe' | 'paypal'; notes?: string }
   ): Promise<PaymentResponse> {
     const payment = await this.repository.findById(id);
@@ -824,7 +824,7 @@ export class PaymentService {
    */
   async updatePaymentMethod(
     id: string,
-    userId: string,
+    _userId: string,
     data: { paymentMethod: string; gateway: 'stripe' | 'paypal'; notes?: string }
   ): Promise<PaymentResponse> {
     const payment = await this.repository.findById(id);
@@ -993,8 +993,8 @@ export class PaymentService {
 
       if (newStatus === PaymentStatus.FAILED) {
         updateData.failedAt = new Date();
-        // Extract failure reason from webhook event if available
-        const failureReason = webhookEvent.failureReason || webhookEvent.error?.message || 'Payment gateway reported failure';
+        // Extract failure reason from webhook event data if available
+        const failureReason = webhookEvent.data?.failureReason || webhookEvent.data?.error?.message || 'Payment gateway reported failure';
         updateData.failureReason = failureReason;
       }
 

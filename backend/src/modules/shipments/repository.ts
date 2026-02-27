@@ -16,7 +16,7 @@ export class ShipmentRepository {
    * Optionally populate related documents
    */
   async findById(id: string, populate?: boolean): Promise<IShipment | null> {
-    let query = Shipment.findOne({ _id: id, deletedAt: null });
+    let query: any = Shipment.findOne({ _id: id, deletedAt: null });
     
     if (populate) {
       query = query
@@ -26,7 +26,7 @@ export class ShipmentRepository {
         .populate('trackingEvents.userId', 'email firstName lastName');
     }
     
-    return await query.exec();
+    return (await query.exec()) as IShipment | null;
   }
 
   /**

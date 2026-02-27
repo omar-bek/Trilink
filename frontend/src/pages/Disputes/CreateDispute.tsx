@@ -40,7 +40,7 @@ export const CreateDispute = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<CreateDisputeDto>({
-    resolver: yupResolver(validationSchema),
+    resolver: yupResolver(validationSchema) as any,
     defaultValues: {
       contractId: '',
       againstCompanyId: '',

@@ -1,12 +1,10 @@
 import mongoose from 'mongoose';
 import { CacheService } from '../../utils/cache';
-import { logger } from '../../utils/logger';
 import { PurchaseRequest } from '../purchase-requests/schema';
 import { Contract } from '../contracts/schema';
 import { Bid } from '../bids/schema';
 import { Payment } from '../payments/schema';
 import { Dispute } from '../disputes/schema';
-import { Company } from '../companies/schema';
 import { RFQ } from '../rfqs/schema';
 
 export interface PrecomputedMetrics {

@@ -14,6 +14,7 @@ import { designTokens } from '@/theme/designTokens';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { contractService } from '@/services/contract.service';
 import { queryKeys } from '@/lib/queryKeys';
+import { ContractStatus } from '@/types/contract';
 
 const { spacing } = designTokens;
 
@@ -41,7 +42,7 @@ export const ContractAcceptance = ({
   const contract = contractData?.data;
 
   const acceptMutation = useMutation({
-    mutationFn: (id: string) => contractService.signContract(id, { signed: true }),
+    mutationFn: (id: string) => contractService.signContract(id, { signature: 'signed' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.contracts.detail(propContractId || '') });
       setAccepted(true);
@@ -49,7 +50,7 @@ export const ContractAcceptance = ({
   });
 
   const rejectMutation = useMutation({
-    mutationFn: (id: string) => contractService.updateContract(id, { status: 'rejected' }),
+    mutationFn: (id: string) => contractService.updateContract(id, { status: ContractStatus.CANCELLED }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.contracts.detail(propContractId || '') });
     },
@@ -78,7 +79,7 @@ export const ContractAcceptance = ({
   return (
     <EnterpriseCard
       title={`Contract Acceptance - ${serviceConfig.displayName}`}
-      subtitle={`Contract: ${contract.contractNumber || contract._id}`}
+      subtitle={`Contract: ${contract._id}`}
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: spacing.lg }}>
         {/* Contract Status */}
@@ -86,9 +87,9 @@ export const ContractAcceptance = ({
           <Typography variant="h6">Contract Status</Typography>
           <StatusBadge
             status={
-              contract.status === 'accepted'
+              contract.status === ContractStatus.SIGNED || contract.status === ContractStatus.ACTIVE
                 ? 'success'
-                : contract.status === 'rejected'
+                : contract.status === ContractStatus.CANCELLED || contract.status === ContractStatus.TERMINATED
                 ? 'error'
                 : 'warning'
             }
@@ -107,7 +108,7 @@ export const ContractAcceptance = ({
             <ListItem>
               <ListItemText
                 primary="Contract Number"
-                secondary={contract.contractNumber || 'N/A'}
+                secondary={contract._id}
               />
             </ListItem>
             <ListItem>
@@ -119,7 +120,7 @@ export const ContractAcceptance = ({
             <ListItem>
               <ListItemText
                 primary="Total Value"
-                secondary={`${contract.totalAmount || 0} ${contract.currency || 'AED'}`}
+                secondary={`${contract.amounts?.total || 0} ${contract.amounts?.currency || 'AED'}`}
               />
             </ListItem>
             <ListItem>
@@ -152,7 +153,7 @@ export const ContractAcceptance = ({
         )}
 
         {/* Actions */}
-        {contract.status === 'pending' && !accepted && (
+        {contract.status === ContractStatus.PENDING_SIGNATURES && !accepted && (
           <>
             <Divider />
             <Box sx={{ display: 'flex', gap: spacing.lg, justifyContent: 'flex-end' }}>

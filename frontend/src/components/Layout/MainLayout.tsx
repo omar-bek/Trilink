@@ -372,7 +372,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             {notifications && notifications.length >= 0 && (
               <NotificationPanel
                 notifications={notifications.map((n) => ({
-                  id: n._id || n.id || String(Math.random()),
+                  id: (n as any)._id || (n as any).id || String(Math.random()),
                   title: n.title || 'Notification',
                   message: n.message || '',
                   type: (n.type as 'success' | 'error' | 'warning' | 'info') || 'info',

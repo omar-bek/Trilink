@@ -60,7 +60,7 @@ class SocketService {
     // Create manager if it doesn't exist
     if (!this.manager) {
       this.manager = new Manager(baseUrl, {
-        transports: ['websocket', 'polling'],
+        transports: ['websocket', 'polling'] as any,
         reconnection: true,
         reconnectionDelay: this.reconnectDelay,
         reconnectionDelayMax: 5000,
@@ -74,7 +74,7 @@ class SocketService {
       auth: {
         token,
       },
-      transports: ['websocket', 'polling'],
+      ...({ transports: ['websocket', 'polling'] } as any),
     });
 
     // Setup connection handlers
@@ -112,7 +112,7 @@ class SocketService {
           // Try to refresh token
           const { authService } = await import('./auth.service');
           const response = await authService.refreshToken();
-          const newToken = response.data.data.accessToken;
+          const newToken = (response.data as any)?.data?.accessToken || (response.data as any)?.accessToken;
           
           // Update token and reconnect
           this.accessToken = newToken;
@@ -207,7 +207,7 @@ class SocketService {
     this.reconnectAttempts.clear();
 
     if (this.manager) {
-      this.manager.disconnect();
+      (this.manager as any).disconnect();
       this.manager = null;
     }
 

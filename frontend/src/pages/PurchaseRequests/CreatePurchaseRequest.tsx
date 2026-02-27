@@ -76,7 +76,7 @@ export const CreatePurchaseRequest = () => {
     watch,
     trigger,
   } = useForm<CreatePurchaseRequestDto>({
-    resolver: yupResolver(validationSchema),
+    resolver: yupResolver(validationSchema) as any,
     defaultValues: {
       categoryId: '',
       subCategoryId: '',

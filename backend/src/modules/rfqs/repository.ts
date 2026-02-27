@@ -126,8 +126,9 @@ export class RFQRepository {
       query.type = filters.type;
     }
 
+    query.deadline = { $gte: new Date() };
+
     return await RFQ.find(query)
-      .where('deadline').gte(new Date())
       .sort({ deadline: 1 });
   }
 
@@ -163,8 +164,9 @@ export class RFQRepository {
       query.type = filters.type;
     }
 
+    query.deadline = { $gte: new Date() };
+
     return await RFQ.find(query)
-      .where('deadline').gte(new Date())
       .sort({ deadline: 1 });
   }
 

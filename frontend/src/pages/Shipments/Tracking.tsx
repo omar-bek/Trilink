@@ -24,6 +24,7 @@ import { useShipments } from '@/hooks/useShipments';
 import { ShipmentStatus, ShipmentFilters } from '@/types/shipment';
 import { PageSkeleton } from '@/components/LoadingSkeleton/LoadingSkeleton';
 import { formatDate } from '@/utils';
+import { normalizeResponse } from '@/utils/responseHelpers';
 
 export const Tracking = () => {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ export const Tracking = () => {
 
   const filters: ShipmentFilters = statusFilter !== 'all' ? { status: statusFilter } : {};
   const { data, isLoading, error } = useShipments(filters);
-  const shipments = data?.data || [];
+  const shipments = normalizeResponse(data?.data);
 
   // Filter shipments that have GPS tracking (currentLocation)
   const trackedShipments = shipments.filter(

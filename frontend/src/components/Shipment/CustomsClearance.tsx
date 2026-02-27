@@ -119,6 +119,7 @@ export const CustomsClearance = ({ shipment, onUpdate }: CustomsClearanceProps) 
   const [documentTypes, setDocumentTypes] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [resubmitNotes, setResubmitNotes] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const submitDocumentsMutation = useSubmitCustomsDocuments();
   const updateStatusMutation = useUpdateCustomsClearanceStatus();
@@ -236,7 +237,7 @@ export const CustomsClearance = ({ shipment, onUpdate }: CustomsClearanceProps) 
         status,
         description,
         rejectionReason,
-        customsAuthority: user?.companyName || 'Customs Authority',
+        customsAuthority: (user as any)?.companyName || 'Customs Authority',
       };
 
       await updateStatusMutation.mutateAsync({ id: shipment._id, data: payload });

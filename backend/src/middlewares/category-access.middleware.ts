@@ -10,7 +10,7 @@ import { PurchaseRequestRepository } from '../modules/purchase-requests/reposito
  */
 export const enforceCategoryAccess = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {

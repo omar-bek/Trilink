@@ -97,7 +97,7 @@ export const RFQDetails = () => {
   const submittedBids = bids.filter((bid: any) => bid.status === 'submitted' || bid.status === 'under_review');
 
   const isBuyer = role === Role.BUYER || role === Role.ADMIN || role === Role.GOVERNMENT;
-  const canRevealIdentity = rfq?.anonymousBuyer && (isBuyer || role === Role.ADMIN || role === Role.GOVERNMENT);
+  const canRevealIdentity = rfq?.anonymousBuyer && (isBuyer || (role as any) === Role.ADMIN || (role as any) === Role.GOVERNMENT);
   
   // Check if this RFQ belongs to the current user's company
   const isOwnCompanyRFQ = rfq && user?.companyId && rfq.companyId && user.companyId === rfq.companyId;

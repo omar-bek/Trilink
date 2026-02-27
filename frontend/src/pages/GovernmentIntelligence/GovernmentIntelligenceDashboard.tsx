@@ -161,12 +161,12 @@ export const GovernmentIntelligenceDashboard = () => {
               TOTAL TRADE VALUE
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem', mt: 0.5 }}>
-              {formatCurrency(summary.totalTradeValue || 0, 'AED')}
+              {formatCurrency((summary as any).totalTradeValue || 0, 'AED')}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
               <TrendingUp sx={{ fontSize: '0.875rem', color: 'success.main' }} />
               <Typography variant="caption" sx={{ color: 'success.main', fontSize: '0.7rem' }}>
-                {summary.tradeGrowth || 0}%
+                {(summary as any).tradeGrowth || 0}%
               </Typography>
             </Box>
           </Paper>
@@ -185,7 +185,7 @@ export const GovernmentIntelligenceDashboard = () => {
               ACTIVE SUPPLIERS
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem', mt: 0.5 }}>
-              {summary.activeSuppliers || 0}
+              {(summary as any).activeSuppliers || 0}
             </Typography>
             <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem', mt: 0.5 }}>
               Registered
@@ -206,7 +206,7 @@ export const GovernmentIntelligenceDashboard = () => {
               CLEARANCE EFFICIENCY
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem', mt: 0.5 }}>
-              {summary.clearanceEfficiency || 0}%
+              {(summary as any).clearanceEfficiency || 0}%
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
               <CheckCircle sx={{ fontSize: '0.875rem', color: 'success.main' }} />
@@ -230,7 +230,7 @@ export const GovernmentIntelligenceDashboard = () => {
               LOGISTICS SCORE
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem', mt: 0.5 }}>
-              {summary.logisticsScore || 0}/10
+              {(summary as any).logisticsScore || 0}/10
             </Typography>
             <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem', mt: 0.5 }}>
               Performance Index
@@ -251,7 +251,7 @@ export const GovernmentIntelligenceDashboard = () => {
               OPPORTUNITY INDEX
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem', mt: 0.5 }}>
-              {summary.opportunityIndex || 0}
+              {(summary as any).opportunityIndex || 0}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
               <Warning sx={{ fontSize: '0.875rem', color: 'warning.main' }} />

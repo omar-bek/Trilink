@@ -11,6 +11,7 @@
  */
 
 import React, { useMemo, useCallback, useRef, useState, useEffect } from 'react';
+// @ts-ignore - react-window types may be outdated
 import { FixedSizeList as List } from 'react-window';
 import {
   Table,
@@ -183,7 +184,7 @@ export function VirtualizedTable<T extends Record<string, any>>({
   const handleSort = useCallback((field: string) => {
     const newDirection =
       sort.field === field && sort.direction === 'asc' ? 'desc' : 'asc';
-    const newSort = { field, direction: newDirection };
+    const newSort = { field, direction: newDirection as 'asc' | 'desc' };
     setInternalSort(newSort);
     if (onSortChange) {
       onSortChange(field, newDirection);

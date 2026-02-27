@@ -32,7 +32,7 @@ export const initRedis = async (): Promise<void> => {
       },
     });
 
-    redisClient.on('error', (err) => {
+    redisClient.on('error', (_err) => {
       // Throttle error logging
       const now = Date.now();
       if (now - lastErrorLogTime > ERROR_LOG_THROTTLE) {

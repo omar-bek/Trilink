@@ -23,6 +23,7 @@ import { AuditAction, AuditResource } from '../audit/schema';
 import { config } from '../../config/env';
 import { notificationService, NotificationEvent } from '../notifications';
 import { notificationHelpers } from '../notifications/helpers';
+import mongoose from 'mongoose';
 
 export class BidService {
   private repository: BidRepository;
@@ -90,6 +91,14 @@ export class BidService {
     }
 
     // Validate payment schedule if provided
+    let paymentScheduleWithDates: Array<{
+      milestone: string;
+      amount?: number;
+      percentage?: number;
+      dueDate?: Date;
+      description?: string;
+    }> | undefined;
+    
     if (data.paymentSchedule && data.paymentSchedule.length > 0) {
       // Validate percentages total 100%
       const totalPercentage = data.paymentSchedule.reduce((sum, payment) => {
@@ -115,23 +124,25 @@ export class BidService {
         );
       }
 
-      // Convert dueDate strings to Date objects
-      data.paymentSchedule = data.paymentSchedule.map(payment => ({
+      // Convert dueDate strings to Date objects for schema
+      paymentScheduleWithDates = data.paymentSchedule.map(payment => ({
         ...payment,
         dueDate: payment.dueDate ? new Date(payment.dueDate) : undefined,
       }));
     }
-
+    
     // Create bid
     const bid = await this.repository.create({
       ...data,
+      rfqId: new mongoose.Types.ObjectId(data.rfqId),
       price: totalPrice, // Use calculated total price
-      providerId,
-      companyId,
+      providerId: new mongoose.Types.ObjectId(providerId),
+      companyId: new mongoose.Types.ObjectId(companyId),
+      paymentSchedule: paymentScheduleWithDates,
       deliveryDate: new Date(data.deliveryDate),
       validity: validityDate,
       status: BidStatus.SUBMITTED,
-    });
+    } as Partial<IBid>);
 
     // Calculate AI score (async, non-blocking) - only if AI is enabled
     if (config.ai.enabled) {
@@ -232,14 +243,14 @@ export class BidService {
         NotificationEvent.BID_SUBMITTED,
         {
           title: `New Bid Submitted for RFQ: ${rfq.title}`,
-          message: `A new bid has been submitted by ${bid.companyId?.name || 'a supplier'} for RFQ ${rfq.title}. Price: ${bid.currency} ${bid.price?.toLocaleString()}`,
+          message: `A new bid has been submitted by a supplier for RFQ ${rfq.title}. Price: ${bid.currency} ${bid.price?.toLocaleString()}`,
           entityType: 'bid',
           entityId: bid._id.toString(),
-          actionUrl: `${config.FRONTEND_URL || 'http://localhost:3001'}/bids/${bid._id}`,
+          actionUrl: `${config.frontend.url || 'http://localhost:3001'}/bids/${bid._id}`,
           rfqId: rfq._id.toString(),
           rfqTitle: rfq.title,
           bidId: bid._id.toString(),
-          companyName: bid.companyId?.name || 'Supplier',
+          companyName: 'Supplier',
           price: `${bid.currency} ${bid.price?.toLocaleString()}`,
           deliveryTime: `${bid.deliveryTime} days`,
         }
@@ -254,7 +265,7 @@ export class BidService {
           message: `Your bid for RFQ "${rfq.title}" has been submitted successfully. Price: ${bid.currency} ${bid.price?.toLocaleString()}`,
           entityType: 'bid',
           entityId: bid._id.toString(),
-          actionUrl: `${config.FRONTEND_URL || 'http://localhost:3001'}/bids/${bid._id}`,
+          actionUrl: `${config.frontend.url || 'http://localhost:3001'}/bids/${bid._id}`,
           rfqId: rfq._id.toString(),
           rfqTitle: rfq.title,
           bidId: bid._id.toString(),
@@ -296,6 +307,7 @@ export class BidService {
     // Return bid response - requester is the bid creator (provider)
     return this.toBidResponse(bid, companyId, undefined);
   }
+
 
   /**
    * Get bid by ID
@@ -504,7 +516,16 @@ export class BidService {
       throw new AppError('Cannot change status through update. Use withdraw or evaluate endpoints.', 400);
     }
 
-    const updateData: Partial<IBid> = { ...data };
+    const updateData: Partial<IBid> = {};
+    if (data.price !== undefined) updateData.price = data.price;
+    if (data.paymentTerms !== undefined) updateData.paymentTerms = data.paymentTerms;
+    if (data.deliveryTime !== undefined) updateData.deliveryTime = data.deliveryTime;
+    if (data.attachments !== undefined) {
+      updateData.attachments = data.attachments.map(att => ({
+        ...att,
+        uploadedAt: new Date(),
+      }));
+    }
     if (data.deliveryDate) {
       updateData.deliveryDate = new Date(data.deliveryDate);
     }
@@ -514,6 +535,12 @@ export class BidService {
         throw new AppError('Bid validity date must be in the future', 400);
       }
       updateData.validity = validityDate;
+    }
+    if (data.paymentSchedule) {
+      updateData.paymentSchedule = data.paymentSchedule.map(payment => ({
+        ...payment,
+        dueDate: payment.dueDate ? new Date(payment.dueDate) : undefined,
+      }));
     }
 
     const updated = await this.repository.update(id, updateData);
@@ -600,14 +627,14 @@ export class BidService {
           NotificationEvent.BID_WITHDRAWN,
           {
             title: `Bid Withdrawn for RFQ: ${rfq.title}`,
-            message: `A bid has been withdrawn by ${updated.companyId?.name || 'a supplier'} for RFQ "${rfq.title}".`,
+            message: `A bid has been withdrawn by a supplier for RFQ "${rfq.title}".`,
             entityType: 'bid',
             entityId: updated._id.toString(),
-            actionUrl: `${config.FRONTEND_URL || 'http://localhost:3001'}/bids/${updated._id}`,
+            actionUrl: `${config.frontend.url || 'http://localhost:3001'}/bids/${updated._id}`,
             rfqId: rfq._id.toString(),
             rfqTitle: rfq.title,
             bidId: updated._id.toString(),
-            companyName: updated.companyId?.name || 'Supplier',
+            companyName: 'Supplier',
           }
         );
 
@@ -620,7 +647,7 @@ export class BidService {
             message: `Your bid for RFQ "${rfq.title}" has been withdrawn.`,
             entityType: 'bid',
             entityId: updated._id.toString(),
-            actionUrl: `${config.FRONTEND_URL || 'http://localhost:3001'}/bids/${updated._id}`,
+            actionUrl: `${config.frontend.url || 'http://localhost:3001'}/bids/${updated._id}`,
             rfqId: rfq._id.toString(),
             rfqTitle: rfq.title,
             bidId: updated._id.toString(),
@@ -776,11 +803,11 @@ export class BidService {
                 : `A bid has been rejected for RFQ "${rfq.title}". ${data.notes ? `Notes: ${data.notes}` : ''}`,
               entityType: 'bid',
               entityId: updated._id.toString(),
-              actionUrl: `${config.FRONTEND_URL || 'http://localhost:3001'}/bids/${updated._id}`,
+              actionUrl: `${config.frontend.url || 'http://localhost:3001'}/bids/${updated._id}`,
               rfqId: rfq._id.toString(),
               rfqTitle: rfq.title,
               bidId: updated._id.toString(),
-              companyName: updated.companyId?.name || 'Supplier',
+              companyName: 'Supplier',
               price: `${updated.currency} ${updated.price?.toLocaleString()}`,
               notes: data.notes,
             }
@@ -799,7 +826,7 @@ export class BidService {
                 : `Your bid for RFQ "${rfq.title}" has been rejected. ${data.notes ? `Reason: ${data.notes}` : ''}`,
               entityType: 'bid',
               entityId: updated._id.toString(),
-              actionUrl: `${config.FRONTEND_URL || 'http://localhost:3001'}/bids/${updated._id}`,
+              actionUrl: `${config.frontend.url || 'http://localhost:3001'}/bids/${updated._id}`,
               rfqId: rfq._id.toString(),
               rfqTitle: rfq.title,
               bidId: updated._id.toString(),

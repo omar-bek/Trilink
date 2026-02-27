@@ -3,7 +3,7 @@ import { DisputeController } from './controller';
 import { authenticate } from '../../middlewares/auth.middleware';
 import { requirePermission, requireRole } from '../../middlewares/rbac.middleware';
 import { Permission, Role } from '../../config/rbac';
-import { filterByCompany, requireResourceOwnership } from '../../middlewares/ownership.middleware';
+import { requireResourceOwnership } from '../../middlewares/ownership.middleware';
 import { DisputeRepository } from './repository';
 import { z } from 'zod';
 

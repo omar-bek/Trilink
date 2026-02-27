@@ -592,7 +592,7 @@ export const CompanyManagement = () => {
     reset: resetCreate,
     formState: { errors: createErrors },
   } = useForm<CreateCompanyDto>({
-    resolver: yupResolver(createCompanySchema),
+    resolver: yupResolver(createCompanySchema) as any,
     defaultValues: {
       name: '',
       registrationNumber: '',

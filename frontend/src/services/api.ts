@@ -254,7 +254,7 @@ api.interceptors.response.use(
       if (!isUnauthorizedPage && !isLoginPage) {
         // Extract error message from response
         const errorMessage = error.response?.data?.message || 
-                           error.response?.data?.error || 
+                           (error.response?.data as any)?.error || 
                            'You do not have permission to access this resource.';
         
         // Navigate to unauthorized page with error message in state

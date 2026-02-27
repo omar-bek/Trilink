@@ -39,7 +39,7 @@ export const NegotiationRoom = ({ serviceType, serviceConfig, bidId, contractId 
   // Fetch negotiation data
   const { data: negotiationData, isLoading } = useQuery({
     queryKey: queryKeys.bids.detail(bidId || ''),
-    queryFn: () => bidService.getBid(bidId || ''),
+    queryFn: () => bidService.getBidById(bidId || ''),
     enabled: !!bidId && serviceConfig.workflow.hasNegotiation,
   });
 
@@ -118,7 +118,7 @@ export const NegotiationRoom = ({ serviceType, serviceConfig, bidId, contractId 
                   <Typography variant="body2">{msg.message}</Typography>
                 </Paper>
               </Box>
-            ))}
+            ))
           )}
         </Box>
 

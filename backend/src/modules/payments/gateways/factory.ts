@@ -2,7 +2,6 @@ import { IPaymentGateway } from './types';
 import { PaymentGateway } from './types';
 import { StripeGateway } from './stripe.gateway';
 import { PayPalGateway } from './paypal.gateway';
-import { config } from '../../../config/env';
 
 /**
  * Payment Gateway Factory

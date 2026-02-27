@@ -9,8 +9,7 @@ import { useState } from 'react';
 import {
   Box,
   Typography,
-  Card,
-  CardContent,
+
   Grid,
   TextField,
   Button,
@@ -24,13 +23,13 @@ import {
   Divider,
   Alert,
   Tooltip,
-  IconButton,
+
   Collapse,
   Chip,
 } from '@mui/material';
 import {
   Calculate,
-  AttachMoney,
+  
   Receipt,
   Info,
   AutoAwesome,
@@ -40,7 +39,7 @@ import {
 import { EnterpriseCard } from '@/components/common/EnterpriseCard';
 import { designTokens } from '@/theme/designTokens';
 
-const { colors, spacing, borders, typography } = designTokens;
+const { colors, borders } = designTokens;
 
 export interface TaxBreakdown {
   label: string;

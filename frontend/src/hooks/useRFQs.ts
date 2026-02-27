@@ -44,14 +44,6 @@ export const useRFQs = (filters?: RFQFilters, pagination?: PaginationParams) => 
       }
       return failureCount < 2;
     },
-    onError: (error: any) => {
-      // Handle permission errors gracefully
-      if (error?.response?.status === 403) {
-        // Permission denied - user doesn't have access
-        // This is expected for some roles, so we don't show an error
-        return;
-      }
-    },
   });
 };
 

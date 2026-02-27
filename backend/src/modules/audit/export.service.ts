@@ -72,7 +72,7 @@ export class AuditExportService {
         // Draw table rows
         doc.font('Helvetica');
         let y = tableTop + rowHeight;
-        logs.forEach((log, index) => {
+        logs.forEach((log, _index) => {
           if (y > 750) {
             // New page
             doc.addPage();
@@ -125,7 +125,7 @@ export class AuditExportService {
   /**
    * Export audit logs to Excel/CSV format
    */
-  async exportToCSV(logs: IAuditLog[], options: ExportOptions): Promise<string> {
+  async exportToCSV(logs: IAuditLog[], _options: ExportOptions): Promise<string> {
     const headers = [
       'Timestamp',
       'User Email',

@@ -4,7 +4,6 @@
  * Comprehensive examples showing how to use all AI-driven components
  */
 
-import { useState } from 'react';
 import { Grid, Box, Typography, Divider } from '@mui/material';
 import {
   PriceBenchmarkingWidget,

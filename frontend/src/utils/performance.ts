@@ -11,7 +11,7 @@
  * - TTI: < 3.5s
  */
 
-import { onCLS, onFID, onFCP, onLCP, onTTFB, onINP, Metric } from 'web-vitals';
+import { onCLS, onFCP, onLCP, onTTFB, onINP, Metric } from 'web-vitals';
 
 export interface PerformanceMetrics {
   fcp: number | null; // First Contentful Paint
@@ -71,11 +71,12 @@ class PerformanceMonitor {
       this.checkThreshold('lcp', metric.value);
     });
 
-    onFID((metric) => {
-      this.metrics.fid = metric.value;
-      this.notifyListeners();
-      this.checkThreshold('fid', metric.value);
-    });
+    // onFID removed in web-vitals v3, use onINP instead
+    // onFID((metric) => {
+    //   this.metrics.fid = metric.value;
+    //   this.notifyListeners();
+    //   this.checkThreshold('fid', metric.value);
+    // });
 
     onCLS((metric) => {
       this.metrics.cls = metric.value;

@@ -27,7 +27,7 @@ import {
   FilterList,
   FileDownload,
 } from '@mui/icons-material';
-import { DatePicker } from '@mui/x-date-pickers';
+// import { DatePicker } from '@mui/x-date-pickers'; // Package not installed - using TextField type="date" instead
 import { useGovernmentAnalytics } from '@/hooks/useAnalytics';
 import { KPICard } from '@/components/Dashboard/KPICard';
 import { AnalyticsChart } from '@/components/Analytics/AnalyticsChart';
@@ -99,6 +99,33 @@ export const GovernmentAnalytics = () => {
 
   const kpis = analytics?.kpis || {};
   const charts = analytics?.charts || {};
+  
+  // Transform chart data to expected format
+  const transformChartData = (data: any): Array<{ label: string; value: number; [key: string]: any }> | undefined => {
+    if (!data) return undefined;
+    if (Array.isArray(data)) {
+      return data.map(item => {
+        if (item.month && item.count !== undefined) {
+          return { label: item.month, value: item.count, ...item };
+        }
+        if (item.month && item.value !== undefined) {
+          return { label: item.month, value: item.value, ...item };
+        }
+        if (item.month && item.amount !== undefined) {
+          return { label: item.month, value: item.amount, ...item };
+        }
+        return item;
+      });
+    }
+    if (typeof data === 'object') {
+      return Object.entries(data).map(([key, value]) => ({
+        label: key,
+        value: typeof value === 'number' ? value : 0,
+        [key]: value,
+      }));
+    }
+    return undefined;
+  };
   const trends = analytics?.trends || {};
 
   return (
@@ -196,7 +223,7 @@ export const GovernmentAnalytics = () => {
         <Grid item xs={12} sm={6} md={3}>
           <KPICard
             title="Total Companies"
-            value={kpis.activeCompanies || 0}
+            value={(kpis as any).activeCompanies || 0}
             icon={<Business />}
             color="primary"
             loading={isLoading}
@@ -205,7 +232,7 @@ export const GovernmentAnalytics = () => {
         <Grid item xs={12} sm={6} md={3}>
           <KPICard
             title="Total Contracts"
-            value={kpis.totalContracts || 0}
+            value={(kpis as any).totalContracts || 0}
             icon={<AccountBalance />}
             color="success"
             loading={isLoading}
@@ -214,7 +241,7 @@ export const GovernmentAnalytics = () => {
         <Grid item xs={12} sm={6} md={3}>
           <KPICard
             title="Contract Value"
-            value={formatCurrency(kpis.totalContractValue || 0, 'AED')}
+            value={formatCurrency((kpis as any).totalContractValue || 0, 'AED')}
             icon={<TrendingUp />}
             color="info"
             loading={isLoading}
@@ -231,7 +258,7 @@ export const GovernmentAnalytics = () => {
         <Grid item xs={12} sm={6} md={3}>
           <KPICard
             title="Total Payments"
-            value={formatCurrency(kpis.totalPaymentAmount || 0, 'AED')}
+            value={formatCurrency((kpis as any).totalPaymentAmount || 0, 'AED')}
             icon={<Payment />}
             color="warning"
             loading={isLoading}
@@ -248,7 +275,7 @@ export const GovernmentAnalytics = () => {
         <Grid item xs={12} sm={6} md={3}>
           <KPICard
             title="Completed Payments"
-            value={formatCurrency(kpis.totalCompletedPaymentAmount || 0, 'AED')}
+            value={formatCurrency((kpis as any).totalCompletedPaymentAmount || 0, 'AED')}
             icon={<Payment />}
             color="success"
             loading={isLoading}
@@ -257,7 +284,7 @@ export const GovernmentAnalytics = () => {
         <Grid item xs={12} sm={6} md={3}>
           <KPICard
             title="Pending Payments"
-            value={formatCurrency(kpis.totalPendingPaymentAmount || 0, 'AED')}
+            value={formatCurrency((kpis as any).totalPendingPaymentAmount || 0, 'AED')}
             icon={<Payment />}
             color="warning"
             loading={isLoading}
@@ -266,7 +293,7 @@ export const GovernmentAnalytics = () => {
         <Grid item xs={12} sm={6} md={3}>
           <KPICard
             title="Total RFQs"
-            value={kpis.totalRFQs || 0}
+            value={(kpis as any).totalRFQs || 0}
             icon={<Assignment />}
             color="info"
             loading={isLoading}
@@ -275,7 +302,7 @@ export const GovernmentAnalytics = () => {
         <Grid item xs={12} sm={6} md={3}>
           <KPICard
             title="Escalated Disputes"
-            value={kpis.escalatedDisputes || 0}
+            value={(kpis as any).escalatedDisputes || 0}
             icon={<Gavel />}
             color="error"
             loading={isLoading}
@@ -291,7 +318,7 @@ export const GovernmentAnalytics = () => {
             <AnalyticsChart
               title="Purchase Requests by Month"
               type="bar"
-              data={charts.purchaseRequestsByMonth}
+              data={transformChartData(charts.purchaseRequestsByMonth)}
               loading={isLoading}
             />
           </Grid>
@@ -303,7 +330,7 @@ export const GovernmentAnalytics = () => {
             <AnalyticsChart
               title="Contracts by Status"
               type="pie"
-              data={charts.contractsByStatus}
+              data={transformChartData(charts.contractsByStatus)}
               loading={isLoading}
             />
           </Grid>
@@ -315,7 +342,7 @@ export const GovernmentAnalytics = () => {
             <AnalyticsChart
               title="Payments by Status"
               type="pie"
-              data={charts.paymentsByStatus}
+              data={transformChartData(charts.paymentsByStatus)}
               loading={isLoading}
             />
           </Grid>
@@ -327,7 +354,7 @@ export const GovernmentAnalytics = () => {
             <AnalyticsChart
               title="Contracts by Month"
               type="line"
-              data={charts.contractsByMonth}
+              data={transformChartData(charts.contractsByMonth)}
               loading={isLoading}
             />
           </Grid>
@@ -339,7 +366,7 @@ export const GovernmentAnalytics = () => {
             <AnalyticsChart
               title="Payments by Month"
               type="line"
-              data={charts.paymentsByMonth}
+              data={transformChartData(charts.paymentsByMonth)}
               loading={isLoading}
             />
           </Grid>
@@ -351,7 +378,7 @@ export const GovernmentAnalytics = () => {
             <AnalyticsChart
               title="Companies by Type"
               type="pie"
-              data={charts.companiesByType}
+              data={transformChartData(charts.companiesByType)}
               loading={isLoading}
             />
           </Grid>
@@ -363,7 +390,7 @@ export const GovernmentAnalytics = () => {
             <AnalyticsChart
               title="Disputes by Type"
               type="bar"
-              data={charts.disputesByType}
+              data={transformChartData(charts.disputesByType)}
               loading={isLoading}
             />
           </Grid>
@@ -384,7 +411,7 @@ export const GovernmentAnalytics = () => {
                     Total Purchase Requests
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {kpis.totalPurchaseRequests || 0}
+                    {(kpis as any).totalPurchaseRequests || 0}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -392,7 +419,7 @@ export const GovernmentAnalytics = () => {
                     Total Bids
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {kpis.totalBids || 0}
+                    {(kpis as any).totalBids || 0}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -400,7 +427,7 @@ export const GovernmentAnalytics = () => {
                     Active Shipments
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {kpis.activeShipments || 0}
+                    {(kpis as any).activeShipments || 0}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -408,7 +435,7 @@ export const GovernmentAnalytics = () => {
                     Total Disputes
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {kpis.totalDisputes || 0}
+                    {(kpis as any).totalDisputes || 0}
                   </Typography>
                 </Box>
               </Box>
@@ -427,7 +454,7 @@ export const GovernmentAnalytics = () => {
                     Total Payment Amount
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {formatCurrency(kpis.totalPaymentAmount || 0, 'AED')}
+                    {formatCurrency((kpis as any).totalPaymentAmount || 0, 'AED')}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -435,7 +462,7 @@ export const GovernmentAnalytics = () => {
                     Completed Payments
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600, color: 'success.main' }}>
-                    {formatCurrency(kpis.totalCompletedPaymentAmount || 0, 'AED')}
+                    {formatCurrency((kpis as any).totalCompletedPaymentAmount || 0, 'AED')}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -443,7 +470,7 @@ export const GovernmentAnalytics = () => {
                     Pending Payments
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600, color: 'warning.main' }}>
-                    {formatCurrency(kpis.totalPendingPaymentAmount || 0, 'AED')}
+                    {formatCurrency((kpis as any).totalPendingPaymentAmount || 0, 'AED')}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -451,8 +478,8 @@ export const GovernmentAnalytics = () => {
                     Completion Rate
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {kpis.totalPaymentAmount
-                      ? `${((kpis.totalCompletedPaymentAmount || 0) / kpis.totalPaymentAmount * 100).toFixed(1)}%`
+                    {(kpis as any).totalPaymentAmount
+                      ? `${(((kpis as any).totalCompletedPaymentAmount || 0) / (kpis as any).totalPaymentAmount * 100).toFixed(1)}%`
                       : '0%'}
                   </Typography>
                 </Box>
@@ -472,7 +499,7 @@ export const GovernmentAnalytics = () => {
                     Active Companies
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {kpis.activeCompanies || 0}
+                    {(kpis as any).activeCompanies || 0}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -480,7 +507,7 @@ export const GovernmentAnalytics = () => {
                     Total Contract Value
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {formatCurrency(kpis.totalContractValue || 0, 'AED')}
+                    {formatCurrency((kpis as any).totalContractValue || 0, 'AED')}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -498,7 +525,7 @@ export const GovernmentAnalytics = () => {
                     Escalated Disputes
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600, color: 'error.main' }}>
-                    {kpis.escalatedDisputes || 0}
+                    {(kpis as any).escalatedDisputes || 0}
                   </Typography>
                 </Box>
               </Box>

@@ -11,7 +11,7 @@
 import { TextField, TextFieldProps, InputAdornment, Box } from '@mui/material';
 import { ReactNode } from 'react';
 
-export interface EnhancedInputProps extends TextFieldProps {
+export interface EnhancedInputProps extends Omit<TextFieldProps, 'helperText'> {
   startIcon?: ReactNode;
   endIcon?: ReactNode;
   helperText?: string;

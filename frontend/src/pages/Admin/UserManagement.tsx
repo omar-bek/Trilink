@@ -266,7 +266,7 @@ export const UserManagement = () => {
     reset: resetCreate,
     formState: { errors: createErrors },
   } = useForm<CreateUserDto>({
-    resolver: yupResolver(createUserSchema),
+    resolver: yupResolver(createUserSchema) as any,
     defaultValues: {
       email: '',
       password: '',

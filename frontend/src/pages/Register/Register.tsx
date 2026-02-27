@@ -103,8 +103,8 @@ export const Register = () => {
     return password.length >= 8;
   };
 
-  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | { value: unknown }>) => {
-    const value = e.target.value as string;
+  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | { value: unknown }> | any) => {
+    const value = (e.target?.value ?? e?.target?.value) as string;
     
     if (field.startsWith('address.')) {
       const addressField = field.split('.')[1];

@@ -1,6 +1,6 @@
 import { UploadRepository } from './repository';
 import { S3Service } from './s3.service';
-import { UploadFileResponse, FileCategory, FileMetadata } from './types';
+import { UploadFileResponse, FileCategory } from './types';
 import { AppError } from '../../middlewares/error.middleware';
 import { IUpload } from './schema';
 import mongoose from 'mongoose';

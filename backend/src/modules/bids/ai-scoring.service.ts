@@ -77,7 +77,7 @@ export class AIScoringService {
    * Score a bid using AI/ML algorithms with full transparency
    * Returns detailed breakdown for explainability
    */
-  async scoreBid(bidId: string, input: ScoringInput): Promise<AIScoreResult> {
+  async scoreBid(_bidId: string, input: ScoringInput): Promise<AIScoreResult> {
     // Simulate async processing delay
     await new Promise((resolve) => setTimeout(resolve, 100));
 

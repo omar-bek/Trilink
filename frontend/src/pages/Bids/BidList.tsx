@@ -28,6 +28,7 @@ import { AIScoreIndicator } from '@/components/Bid/AIScoreIndicator';
 import { formatCurrency, formatDate } from '@/utils';
 import { useNavigate } from 'react-router-dom';
 import { CategoryFilter } from '@/components/Category/CategoryFilter';
+import { convertAIScoreMetadata } from '@/utils/bidHelpers';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Pagination } from '@/components/common/Pagination';
 import { exportToCSV } from '@/utils/export';
@@ -319,19 +320,7 @@ export const BidList = () => {
                     score={bid.aiScore}
                     showLabel={false}
                     size="small"
-                    aiMetadata={bid.aiScoreMetadata
-                      ? {
-                          totalScore: bid.aiScoreMetadata.totalScore,
-                          breakdown: bid.aiScoreMetadata.breakdown,
-                          overallConfidence: bid.aiScoreMetadata.overallConfidence as 'high' | 'medium' | 'low',
-                          overallRisk: bid.aiScoreMetadata.overallRisk as 'low' | 'medium' | 'high',
-                          recommendation: bid.aiScoreMetadata.recommendation,
-                          timestamp: bid.aiScoreMetadata.timestamp
-                            ? new Date(bid.aiScoreMetadata.timestamp)
-                            : undefined,
-                          modelVersion: bid.aiScoreMetadata.modelVersion,
-                        }
-                      : undefined}
+                    aiMetadata={convertAIScoreMetadata(bid.aiScoreMetadata)}
                   />
                 ) : (
                   <Typography variant="body2" color="text.secondary">

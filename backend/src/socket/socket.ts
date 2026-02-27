@@ -8,7 +8,6 @@ import { SocketRoom } from './types';
 import mongoose from 'mongoose';
 import {
   getConnectionManager,
-  DEFAULT_CONNECTION_LIMITS,
   ConnectionLimits,
 } from './connection-manager';
 
@@ -57,7 +56,7 @@ const authenticateSocket = (socket: Socket, next: (err?: Error) => void): void =
 const setupRoomSubscriptions = (
   socket: Socket,
   user: JWTPayload,
-  namespace: string
+  _namespace: string
 ): void => {
   const connectionManager = getConnectionManager();
 
@@ -109,9 +108,6 @@ const cleanupOnDisconnect = (socket: Socket, namespace: string): void => {
     logger.info(
       `Socket disconnected: ${socket.id} (Namespace: ${namespace}, Reason: ${reason})`
     );
-
-    // Get all rooms before cleanup
-    const rooms = connectionManager.getRooms(socket.id);
 
     // Cleanup ping interval
     if (socket.data.pingInterval) {

@@ -30,16 +30,16 @@ export class UserRepository {
    * Find user by email with password (for authentication)
    */
   async findByEmailWithPassword(email: string): Promise<IUser | null> {
-    return await User.findOne({ email: email.toLowerCase(), deletedAt: null })
-      .select('+password');
+    return (await User.findOne({ email: email.toLowerCase(), deletedAt: null })
+      .select('+password').lean()) as IUser | null;
   }
 
   /**
    * Find user by ID with password (for password verification)
    */
   async findByIdWithPassword(id: string): Promise<IUser | null> {
-    return await User.findOne({ _id: id, deletedAt: null })
-      .select('+password');
+    return (await User.findOne({ _id: id, deletedAt: null })
+      .select('+password').lean()) as IUser | null;
   }
 
   /**

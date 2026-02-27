@@ -28,6 +28,7 @@ import { designTokens } from '@/theme/designTokens';
 import { useQuery } from '@tanstack/react-query';
 import { dashboardService } from '@/services/dashboard.service';
 import { queryKeys } from '@/lib/queryKeys';
+import { Role } from '@/types';
 import {
   Inventory,
   VerifiedUser,
@@ -64,7 +65,7 @@ export const ServiceProviderDashboard = () => {
 
   // Fetch dashboard metrics for service provider
   const { data: dashboardData, isLoading } = useQuery({
-    queryKey: queryKeys.dashboard.data('SERVICE_PROVIDER'),
+    queryKey: queryKeys.dashboard.data(Role.SERVICE_PROVIDER),
     queryFn: () => dashboardService.getDashboardData(),
     staleTime: 5 * 60 * 1000,
   });

@@ -11,7 +11,7 @@ export class StripeGateway implements IPaymentGateway {
       throw new Error('Stripe API key is required');
     }
     this.stripe = new Stripe(apiKey, {
-      apiVersion: '2024-11-20.acacia',
+      apiVersion: '2025-12-15.clover' as any,
     });
   }
 

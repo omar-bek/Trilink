@@ -197,9 +197,10 @@ export const GridColumn = ({
 /**
  * Spacer - Flexible space between elements
  */
-export const Spacer = ({ size = 1 }: { size?: number }) => (
-  <Box sx={{ flex: `0 0 ${size * spacing.lg}` }} />
-);
+export const Spacer = ({ size = 1 }: { size?: number }) => {
+  const spacingValue = typeof spacing.lg === 'string' ? parseInt(spacing.lg) : spacing.lg;
+  return <Box sx={{ flex: `0 0 ${size * spacingValue}px` }} />;
+};
 
 /**
  * Section - Standard page section with consistent padding

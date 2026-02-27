@@ -11,7 +11,6 @@ import { BidStatus } from '../bids/schema';
 import { ContractStatus } from '../contracts/schema';
 import { PaymentStatus } from '../payments/schema';
 import { PurchaseRequestStatus } from '../purchase-requests/schema';
-import mongoose from 'mongoose';
 
 export interface DashboardKPIs {
   // Buyer KPIs
@@ -80,8 +79,7 @@ export class DashboardService {
   /**
    * Get dashboard data for a user based on their role and company
    */
-  async getDashboardData(userId: string, companyId: string, role: Role): Promise<DashboardData> {
-    const companyObjectId = new mongoose.Types.ObjectId(companyId);
+  async getDashboardData(_userId: string, companyId: string, role: Role): Promise<DashboardData> {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -365,9 +363,9 @@ export class DashboardService {
         });
         charts.shipmentsByStatus = shipmentsByStatus;
 
-        // GPS Tracking Overview
-        const trackedCount = shipments.filter((s) => s.trackingNumber).length;
-        const notTrackedCount = shipments.filter((s) => !s.trackingNumber).length;
+        // GPS Tracking Overview (using trackingEvents)
+        const trackedCount = shipments.filter((s) => s.trackingEvents && s.trackingEvents.length > 0).length;
+        const notTrackedCount = shipments.filter((s) => !s.trackingEvents || s.trackingEvents.length === 0).length;
         charts.gpsTracking = {
           tracked: trackedCount,
           not_tracked: notTrackedCount,
@@ -384,16 +382,16 @@ export class DashboardService {
         last6Months.forEach((monthStart) => {
           const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0);
           const monthShipments = shipments.filter((s) => {
-            const deliveryDate = s.actualDeliveryDate || s.expectedDeliveryDate;
+            const deliveryDate = s.actualDeliveryDate || s.estimatedDeliveryDate;
             return deliveryDate >= monthStart && deliveryDate <= monthEnd;
           });
           const onTime = monthShipments.filter((s) => {
-            if (!s.actualDeliveryDate || !s.expectedDeliveryDate) return false;
-            return s.actualDeliveryDate <= s.expectedDeliveryDate;
+            if (!s.actualDeliveryDate || !s.estimatedDeliveryDate) return false;
+            return s.actualDeliveryDate <= s.estimatedDeliveryDate;
           }).length;
           const delayed = monthShipments.filter((s) => {
-            if (!s.actualDeliveryDate || !s.expectedDeliveryDate) return false;
-            return s.actualDeliveryDate > s.expectedDeliveryDate;
+            if (!s.actualDeliveryDate || !s.estimatedDeliveryDate) return false;
+            return s.actualDeliveryDate > s.estimatedDeliveryDate;
           }).length;
           const monthLabel = monthStart.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
           deliveryPerformance.push({ name: monthLabel, onTime, delayed });

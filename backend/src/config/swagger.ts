@@ -35,13 +35,13 @@ export const setupSwagger = (app: Express): void => {
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerOptions));
 
     // Serve OpenAPI spec as JSON at /api-docs.json
-    app.get('/api-docs.json', (req, res) => {
+    app.get('/api-docs.json', (_req, res) => {
       res.setHeader('Content-Type', 'application/json');
       res.send(swaggerDocument);
     });
 
     // Serve OpenAPI spec as YAML at /api-docs.yaml
-    app.get('/api-docs.yaml', (req, res) => {
+    app.get('/api-docs.yaml', (_req, res) => {
       const yamlContent = fs.readFileSync(swaggerFilePath, 'utf8');
       res.setHeader('Content-Type', 'text/yaml');
       res.send(yamlContent);

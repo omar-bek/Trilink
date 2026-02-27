@@ -11,7 +11,7 @@ interface RiskBadgeProps {
 export const RiskBadge = ({ level, size = 'medium' }: RiskBadgeProps) => {
   const config: Record<
     RiskLevel,
-    { label: string; color: ChipProps['color']; icon: React.ReactNode }
+    { label: string; color: ChipProps['color']; icon: React.ReactElement }
   > = {
     low: {
       label: 'Low Risk',

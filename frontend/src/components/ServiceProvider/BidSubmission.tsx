@@ -73,7 +73,7 @@ export const BidSubmission = ({ serviceType, serviceConfig, rfqId: propRfqId }: 
     watch,
     setValue,
   } = useForm<CreateBidDto & Record<string, any>>({
-    resolver: yupResolver(buildValidationSchema()),
+    resolver: yupResolver(buildValidationSchema()) as any,
     defaultValues: {
       rfqId: rfqId || '',
       price: 0,
@@ -131,7 +131,7 @@ export const BidSubmission = ({ serviceType, serviceConfig, rfqId: propRfqId }: 
             {rfq.title}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Deadline: {new Date(rfq.bidDeadline).toLocaleDateString()}
+            Deadline: {new Date(rfq.deadline).toLocaleDateString()}
           </Typography>
         </Box>
       )}
@@ -208,7 +208,7 @@ export const BidSubmission = ({ serviceType, serviceConfig, rfqId: propRfqId }: 
                       select
                       label={field.label}
                       error={!!errors[field.id]}
-                      helperText={errors[field.id]?.message}
+                      helperText={errors[field.id]?.message as string}
                       fullWidth
                       SelectProps={{
                         native: true,
@@ -231,7 +231,7 @@ export const BidSubmission = ({ serviceType, serviceConfig, rfqId: propRfqId }: 
                       multiline
                       rows={4}
                       error={!!errors[field.id]}
-                      helperText={errors[field.id]?.message}
+                      helperText={errors[field.id]?.message as string}
                       placeholder={field.placeholder}
                       fullWidth
                     />
@@ -244,7 +244,7 @@ export const BidSubmission = ({ serviceType, serviceConfig, rfqId: propRfqId }: 
                     label={field.label}
                     type={field.type}
                     error={!!errors[field.id]}
-                    helperText={errors[field.id]?.message}
+                    helperText={errors[field.id]?.message as string}
                     placeholder={field.placeholder}
                     fullWidth
                   />

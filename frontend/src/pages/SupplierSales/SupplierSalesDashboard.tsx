@@ -24,6 +24,7 @@ import { isValidId } from '@/utils/routeValidation';
 import { RFQStatus } from '@/types/rfq';
 import { BidStatus } from '@/types/bid';
 import { ContractStatus } from '@/types/contract';
+import { Role } from '@/types';
 import { PaymentStatus } from '@/types/payment';
 import { PageSkeleton } from '@/components/LoadingSkeleton/LoadingSkeleton';
 import { RFQStatusBadge } from '@/components/RFQ/RFQStatusBadge';
@@ -36,8 +37,8 @@ export const SupplierSalesDashboard = () => {
 
   // Fetch Active RFQs (anonymous)
   const { data: activeRFQsData, isLoading: isLoadingRFQs } = useQuery({
-    queryKey: queryKeys.rfqs.list({ status: RFQStatus.OPEN, targetRole: 'Supplier' }),
-    queryFn: () => rfqService.getAvailableRFQs({ status: RFQStatus.OPEN, targetRole: 'Supplier' }),
+    queryKey: queryKeys.rfqs.list({ status: RFQStatus.OPEN, targetRole: Role.SUPPLIER }),
+    queryFn: () => rfqService.getAvailableRFQs({ status: RFQStatus.OPEN, targetRole: Role.SUPPLIER }),
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 

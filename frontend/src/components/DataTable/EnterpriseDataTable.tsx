@@ -150,7 +150,7 @@ export function EnterpriseDataTable<T extends Record<string, any>>({
   const handleSort = (field: string) => {
     const newDirection =
       sort.field === field && sort.direction === 'asc' ? 'desc' : 'asc';
-    const newSort = { field, direction: newDirection };
+    const newSort = { field, direction: newDirection as 'asc' | 'desc' };
     setInternalSort(newSort);
     if (onSortChange) {
       onSortChange(field, newDirection);

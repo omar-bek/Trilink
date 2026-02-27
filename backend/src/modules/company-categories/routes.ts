@@ -16,12 +16,12 @@ router.get('/:companyId/categories', controller.getCompanyCategories);
 // Add/remove categories (admin only, or company owner)
 router.post(
   '/:companyId/categories',
-  requireRole([Role.ADMIN, Role.COMPANY_MANAGER]),
+  requireRole(Role.ADMIN, Role.COMPANY_MANAGER),
   controller.addCategoriesToCompany
 );
 router.delete(
   '/:companyId/categories/:categoryId',
-  requireRole([Role.ADMIN, Role.COMPANY_MANAGER]),
+  requireRole(Role.ADMIN, Role.COMPANY_MANAGER),
   controller.removeCategoryFromCompany
 );
 

@@ -16,6 +16,7 @@ import { CategoryRepository } from '../categories/repository';
 import { CategoryRoutingService } from '../category-routing/service';
 import { categoryEventEmitter, CategoryEvent, PRApprovedPayload } from '../category-routing/events';
 import { CategoryRoutingQueueService } from '../category-routing/queue.service';
+import mongoose from 'mongoose';
 
 export class PurchaseRequestService {
   private repository: PurchaseRequestRepository;
@@ -76,10 +77,10 @@ export class PurchaseRequestService {
     }
 
     const purchaseRequest = await this.repository.create({
-      buyerId,
-      companyId,
-      categoryId: data.categoryId as any,
-      subCategoryId: data.subCategoryId ? (data.subCategoryId as any) : undefined,
+      buyerId: new mongoose.Types.ObjectId(buyerId),
+      companyId: new mongoose.Types.ObjectId(companyId),
+      categoryId: new mongoose.Types.ObjectId(data.categoryId),
+      subCategoryId: data.subCategoryId ? new mongoose.Types.ObjectId(data.subCategoryId) : undefined,
       title: data.title,
       description: data.description,
       items: data.items,
@@ -295,14 +296,38 @@ export class PurchaseRequestService {
       }
     }
 
-    const updateData: Partial<IPurchaseRequest> = { ...data };
+    const updateData: Partial<IPurchaseRequest> = {};
+    
+    // Copy non-category fields
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.items !== undefined) updateData.items = data.items;
+    if (data.budget !== undefined) updateData.budget = data.budget;
+    if (data.currency !== undefined) updateData.currency = data.currency;
+    if (data.requiredDeliveryDate !== undefined) updateData.requiredDeliveryDate = new Date(data.requiredDeliveryDate);
+    if (data.status !== undefined) updateData.status = data.status;
+    
+    // Handle deliveryLocation - only update if all required fields are provided
+    if (data.deliveryLocation !== undefined) {
+      const loc = data.deliveryLocation;
+      if (loc.address && loc.city && loc.state && loc.country && loc.zipCode) {
+        updateData.deliveryLocation = {
+          address: loc.address,
+          city: loc.city,
+          state: loc.state,
+          country: loc.country,
+          zipCode: loc.zipCode,
+          coordinates: loc.coordinates,
+        };
+      }
+    }
     
     // Handle category updates
     if (data.categoryId !== undefined) {
-      updateData.categoryId = data.categoryId as any;
+      updateData.categoryId = new mongoose.Types.ObjectId(data.categoryId);
     }
     if (data.subCategoryId !== undefined) {
-      updateData.subCategoryId = data.subCategoryId ? (data.subCategoryId as any) : null;
+      updateData.subCategoryId = data.subCategoryId ? new mongoose.Types.ObjectId(data.subCategoryId) : undefined;
     }
     
     // Ensure budget is a number if provided
@@ -481,7 +506,7 @@ export class PurchaseRequestService {
     // Update status to approved and set approverId
     const updated = await this.repository.update(id, {
       status: PurchaseRequestStatus.APPROVED,
-      approverId: approverId,
+      approverId: new mongoose.Types.ObjectId(approverId),
     });
 
     if (!updated) {
@@ -623,7 +648,10 @@ export class PurchaseRequestService {
       requiredDeliveryDate: pr.requiredDeliveryDate,
       status: pr.status,
       approverId: pr.approverId?.toString(),
-      approvalHistory: pr.approvalHistory || [],
+      approvalHistory: (pr.approvalHistory || []).map(h => ({
+        ...h,
+        approverId: h.approverId?.toString(),
+      })),
       rfqGenerated: pr.rfqGenerated,
       createdAt: pr.createdAt,
       updatedAt: pr.updatedAt,

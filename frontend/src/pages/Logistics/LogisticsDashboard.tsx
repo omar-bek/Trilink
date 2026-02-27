@@ -39,6 +39,7 @@ import { Role } from '@/types';
 import { formatDate } from '@/utils';
 import { PageSkeleton } from '@/components/LoadingSkeleton/LoadingSkeleton';
 import { KPICard } from '@/components/Dashboard/KPICard';
+import { normalizeResponse } from '@/utils/responseHelpers';
 
 export const LogisticsDashboard = () => {
   const navigate = useNavigate();
@@ -73,18 +74,16 @@ export const LogisticsDashboard = () => {
       }),
   });
 
-  const pendingRFQs = pendingRFQsData?.data || [];
-  const allShipments = awardedShipmentsData?.data || [];
-  const acceptedBids = acceptedBidsData?.data || [];
+  const pendingRFQs = normalizeResponse(pendingRFQsData?.data);
+  const allShipments = normalizeResponse(awardedShipmentsData?.data);
+  const acceptedBids = normalizeResponse(acceptedBidsData?.data);
 
   // Filter shipments assigned to this logistics company
-  const awardedShipments = Array.isArray(allShipments)
-    ? allShipments.filter(
-        (shipment) =>
-          shipment.logisticsCompanyId === user?.companyId ||
-          acceptedBids.some((bid) => bid.rfqId === shipment.contractId)
-      )
-    : [];
+  const awardedShipments = allShipments.filter(
+    (shipment) =>
+      shipment.logisticsCompanyId === user?.companyId ||
+      acceptedBids.some((bid) => bid.rfqId === shipment.contractId)
+  );
 
   // Get pickup schedules (shipments ready for pickup or in transit)
   const pickupSchedules = awardedShipments.filter(

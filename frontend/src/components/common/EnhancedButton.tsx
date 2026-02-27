@@ -11,7 +11,7 @@
 import { Button, ButtonProps, CircularProgress, Box } from '@mui/material';
 import { ReactNode } from 'react';
 
-export interface EnhancedButtonProps extends ButtonProps {
+export interface EnhancedButtonProps extends Omit<ButtonProps, 'variant'> {
   loading?: boolean;
   icon?: ReactNode;
   iconPosition?: 'start' | 'end';

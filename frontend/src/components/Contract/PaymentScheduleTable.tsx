@@ -69,15 +69,15 @@ export const PaymentScheduleTable = ({ contract, payments = [] }: PaymentSchedul
             const paymentTotal = payment.totalAmount || (payment.amount + paymentVat);
             
             // Determine status
-            let displayStatus = payment.status;
+            let displayStatus: PaymentStatus = payment.status;
             if (displayStatus === PaymentStatus.COMPLETED) {
-              displayStatus = 'Completed';
+              displayStatus = PaymentStatus.COMPLETED;
             } else if (displayStatus === PaymentStatus.APPROVED) {
-              displayStatus = 'Approved';
+              displayStatus = PaymentStatus.APPROVED;
             } else if (displayStatus === PaymentStatus.PENDING_APPROVAL) {
-              displayStatus = 'Pending Approval';
+              displayStatus = PaymentStatus.PENDING_APPROVAL;
             } else {
-              displayStatus = 'Pending Approval';
+              displayStatus = PaymentStatus.PENDING_APPROVAL;
             }
 
             // Get valid payment ID - check both _id and id fields

@@ -19,25 +19,25 @@ router.get('/:id/children', controller.getCategoryChildren);
 router.post(
   '/',
   authenticate,
-  requireRole([Role.ADMIN]),
+  requireRole(Role.ADMIN),
   controller.createCategory
 );
 router.put(
   '/:id',
   authenticate,
-  requireRole([Role.ADMIN]),
+  requireRole(Role.ADMIN),
   controller.updateCategory
 );
 router.delete(
   '/:id',
   authenticate,
-  requireRole([Role.ADMIN]),
+  requireRole(Role.ADMIN),
   controller.deleteCategory
 );
 router.get(
   '/admin/all',
   authenticate,
-  requireRole([Role.ADMIN]),
+  requireRole(Role.ADMIN),
   controller.getAllCategoriesAdmin
 );
 

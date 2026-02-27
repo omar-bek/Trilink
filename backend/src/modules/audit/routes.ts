@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { AuditLogController } from './controller';
 import { authenticate } from '../../middlewares/auth.middleware';
-import { requirePermission, requireRole } from '../../middlewares/rbac.middleware';
-import { Permission, Role } from '../../config/rbac';
+import { requirePermission } from '../../middlewares/rbac.middleware';
+import { Permission } from '../../config/rbac';
 
 const router = Router();
 const controller = new AuditLogController();

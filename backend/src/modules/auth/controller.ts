@@ -129,11 +129,12 @@ export class AuthController {
       const refreshToken = getRefreshTokenFromCookie(req);
       
       if (!refreshToken) {
-        return res.status(401).json({
+        res.status(401).json({
           success: false,
           message: 'Refresh token not found',
           requestId: getRequestId(req),
         });
+        return;
       }
 
       // Refresh token and get new tokens (token rotation)

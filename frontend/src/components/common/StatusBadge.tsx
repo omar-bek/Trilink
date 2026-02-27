@@ -12,7 +12,7 @@ const { colors, typography, borders } = designTokens;
 
 export type StatusType = 'success' | 'warning' | 'error' | 'info' | 'neutral' | 'critical';
 
-interface StatusBadgeProps extends Omit<ChipProps, 'color' | 'label'> {
+export interface StatusBadgeProps extends Omit<ChipProps, 'color' | 'label'> {
   status: StatusType;
   label: string;
   variant?: 'filled' | 'outlined';

@@ -105,8 +105,8 @@ export const MultiStepForm: React.FC<MultiStepFormProps> = ({
       >
         <Stepper activeStep={activeStep} alternativeLabel>
           {steps.map((step, index) => (
-            <Step key={step.id} completed={index < activeStep} error={errors[index]}>
-              <StepLabel
+            <Step key={step.id} completed={index < activeStep}>
+              <StepLabel error={errors[index]}
                 optional={
                   step.description && (
                     <Typography variant="caption" color="text.secondary">

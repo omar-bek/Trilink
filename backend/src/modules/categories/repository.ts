@@ -139,7 +139,6 @@ export class CategoryRepository {
       return [];
     }
 
-    const descendants: ICategory[] = [];
     const categoryPath = category.path;
 
     // Find all categories whose path starts with the current category's path

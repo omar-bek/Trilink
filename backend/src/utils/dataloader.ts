@@ -64,7 +64,7 @@ export const createUserLoader = (): DataLoader<string, IUser | null> => {
     // Cache for the duration of the request
     cache: true,
     // Batch requests within 10ms window
-    batchScheduleFn: (callback) => setTimeout(callback, 10),
+    batchScheduleFn: (callback: () => void) => setTimeout(callback, 10),
   });
 };
 
@@ -77,7 +77,7 @@ export const createCompanyLoader = (): DataLoader<string, ICompany | null> => {
     // Cache for the duration of the request
     cache: true,
     // Batch requests within 10ms window
-    batchScheduleFn: (callback) => setTimeout(callback, 10),
+    batchScheduleFn: (callback: () => void) => setTimeout(callback, 10),
   });
 };
 

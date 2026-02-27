@@ -17,7 +17,7 @@ export class NotificationService extends EventEmitter {
 
   constructor() {
     super();
-    this.baseUrl = config.FRONTEND_URL || 'http://localhost:3001';
+    this.baseUrl = config.frontend.url || 'http://localhost:3001';
     this.setupEventListeners();
   }
 

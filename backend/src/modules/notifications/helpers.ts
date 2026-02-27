@@ -1,6 +1,5 @@
 import { EmailRecipient } from './types';
 import { UserRepository } from '../users/repository';
-import { CompanyRepository } from '../companies/repository';
 import { Role } from '../../config/rbac';
 import { Status } from '../../types/common';
 
@@ -9,11 +8,9 @@ import { Status } from '../../types/common';
  */
 export class NotificationHelpers {
   private userRepository: UserRepository;
-  private companyRepository: CompanyRepository;
 
   constructor() {
     this.userRepository = new UserRepository();
-    this.companyRepository = new CompanyRepository();
   }
 
   /**

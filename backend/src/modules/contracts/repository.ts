@@ -23,7 +23,7 @@ export class ContractRepository {
       populatePurchaseRequest?: boolean;
     }
   ): Promise<IContract | null> {
-    let query = Contract.findOne({ _id: id, deletedAt: null });
+    let query: any = Contract.findOne({ _id: id, deletedAt: null });
 
     if (populateOptions?.populateParties) {
       query = query.populate([
@@ -40,7 +40,7 @@ export class ContractRepository {
       });
     }
 
-    return await query.exec();
+    return (await query.exec()) as IContract | null;
   }
 
   /**
@@ -378,13 +378,14 @@ export class ContractRepository {
     }
 
     if (filters?.dateFrom || filters?.dateTo) {
-      matchStage.createdAt = {};
+      const createdAtFilter: { $gte?: Date; $lte?: Date } = {};
       if (filters.dateFrom) {
-        matchStage.createdAt.$gte = filters.dateFrom;
+        createdAtFilter.$gte = filters.dateFrom;
       }
       if (filters.dateTo) {
-        matchStage.createdAt.$lte = filters.dateTo;
+        createdAtFilter.$lte = filters.dateTo;
       }
+      matchStage.createdAt = createdAtFilter;
     }
 
     const pipeline: any[] = [

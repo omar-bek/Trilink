@@ -87,6 +87,7 @@ const errorConfigs: Record<ErrorType, ErrorStateConfig> = {
 
 interface ErrorStateProps {
     type: ErrorType;
+    title?: string;
     details?: string;
     errorCode?: string | number;
     timestamp?: Date;
@@ -95,12 +96,14 @@ interface ErrorStateProps {
 
 export const ErrorState = ({
     type,
+    title,
     details,
     errorCode,
     timestamp,
     showDetails = false,
 }: ErrorStateProps) => {
     const config = errorConfigs[type] || errorConfigs[ErrorType.UNKNOWN];
+    const displayTitle = title || config.title;
 
     return (
         <Paper
@@ -118,7 +121,7 @@ export const ErrorState = ({
             </Box>
 
             <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-                {config.title}
+                {displayTitle}
             </Typography>
 
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: 600, mx: 'auto' }}>

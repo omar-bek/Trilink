@@ -8,6 +8,8 @@ import { useState, useEffect } from 'react';
 
 interface EnhancedErrorRecoveryProps {
   error: Error | unknown;
+  title?: string;
+  message?: string;
   onRetry?: () => Promise<void> | void;
   context?: string;
   cacheKey?: string;
@@ -18,6 +20,8 @@ interface EnhancedErrorRecoveryProps {
 
 export const EnhancedErrorRecovery = ({
   error,
+  title,
+  message,
   onRetry,
   context,
   cacheKey,
@@ -85,7 +89,8 @@ export const EnhancedErrorRecovery = ({
         {/* Error State Display */}
         <ErrorState
           type={errorType}
-          details={errorInfo.message}
+          title={title}
+          details={message || errorInfo.message}
           errorCode={errorInfo.errorCode || errorInfo.statusCode?.toString()}
           timestamp={errorInfo.timestamp}
           showDetails={true}

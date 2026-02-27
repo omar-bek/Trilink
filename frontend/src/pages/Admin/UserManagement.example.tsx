@@ -5,8 +5,38 @@
  * Replace the Table section (lines 185-243) with this implementation.
  */
 
+import { Typography, Chip, Box, IconButton } from '@mui/material';
+import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { ResponsiveTable, ResponsiveTableColumn } from '@/components/common';
 import { UserProfile } from '@/types/user';
+
+// Example helper functions (implement these in your actual component)
+const getStatusColor = (status: string): 'success' | 'warning' | 'error' | 'default' => {
+  switch (status) {
+    case 'active':
+      return 'success';
+    case 'inactive':
+      return 'error';
+    case 'pending':
+      return 'warning';
+    default:
+      return 'default';
+  }
+};
+
+// Example handlers (implement these in your actual component)
+const handleEdit = (user: UserProfile) => {
+  // Implement edit logic
+  console.log('Edit user:', user);
+};
+
+const handleDelete = (user: UserProfile) => {
+  // Implement delete logic
+  console.log('Delete user:', user);
+};
+
+// Example data (replace with your actual data)
+const users: UserProfile[] = [];
 
 // ... existing imports and code ...
 

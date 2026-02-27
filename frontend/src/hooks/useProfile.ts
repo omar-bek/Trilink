@@ -18,13 +18,6 @@ export const useProfile = (userId: string) => {
       // Retry other errors up to 2 times
       return failureCount < 2;
     },
-    // Suppress 403 errors from being logged as they're expected in some cases
-    onError: (error: any) => {
-      // Only log unexpected errors
-      if (error?.response?.status !== 403 && import.meta.env.DEV) {
-        console.warn('User profile fetch error:', error);
-      }
-    },
   });
 };
 
@@ -48,7 +41,7 @@ export const useUpdateProfile = () => {
       // Update auth store with new user data
       const { setUser } = useAuthStore.getState();
       if (user && user.id === variables.userId) {
-        setUser({ ...user, ...response.data });
+        setUser({ ...user, ...response.data, role: response.data.role as any });
       }
       // Invalidate profile query
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.profile(variables.userId) });

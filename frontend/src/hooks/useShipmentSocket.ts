@@ -45,7 +45,7 @@ export const useShipmentSocket = (shipmentId: string | undefined) => {
             data: {
               ...old.data,
               currentLocation: {
-                ...data.location || data,
+                ...((data as any).location || data),
                 lastUpdated: new Date().toISOString(),
               },
             },

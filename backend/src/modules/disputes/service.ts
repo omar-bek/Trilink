@@ -53,11 +53,14 @@ export class DisputeService {
     // Create dispute
     const dispute = await this.repository.create({
       ...data,
-      companyId,
+      companyId: new mongoose.Types.ObjectId(companyId),
       raisedBy: new mongoose.Types.ObjectId(userId),
       againstCompanyId: new mongoose.Types.ObjectId(data.againstCompanyId),
       contractId: new mongoose.Types.ObjectId(data.contractId),
-      attachments: data.attachments || [],
+      attachments: (data.attachments || []).map(att => ({
+        ...att,
+        uploadedAt: new Date(),
+      })),
       status: DisputeStatus.OPEN,
     });
 
@@ -86,7 +89,7 @@ export class DisputeService {
 
     // Notify company managers about dispute creation
     try {
-      const contract = await this.contractRepository.findById(dispute.contractId.toString());
+      await this.contractRepository.findById(dispute.contractId.toString());
       const disputeUrl = `${config.frontend.url}/disputes/${dispute._id}`;
 
       // Notify company that raised dispute
@@ -506,7 +509,7 @@ export class DisputeService {
 
     // Notify company managers about dispute escalation
     try {
-      const contract = await this.contractRepository.findById(updated.contractId.toString());
+      await this.contractRepository.findById(updated.contractId.toString());
       const disputeUrl = `${config.frontend.url}/disputes/${updated._id}`;
 
       // Notify company that raised dispute

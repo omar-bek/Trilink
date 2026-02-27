@@ -1,4 +1,4 @@
-import { ShipmentStatus, InspectionStatus, CustomsClearanceStatus, ICustomsDocument, ICustomsClearanceEvent } from './schema';
+import { ShipmentStatus, InspectionStatus, CustomsClearanceStatus } from './schema';
 
 export interface CreateShipmentDto {
   contractId: string;

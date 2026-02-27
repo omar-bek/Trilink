@@ -238,7 +238,7 @@ export class SecretsManagerService {
   /**
    * Update secret in secrets manager
    */
-  private async updateSecretInManager(key: string, value: string): Promise<void> {
+  private async updateSecretInManager(key: string, _value: string): Promise<void> {
     // In production, implement actual update in secrets manager
     // For now, log the update
     logger.info(`Secret ${key} updated in secrets manager`);

@@ -24,12 +24,13 @@ export const QueryTimeoutMonitor = () => {
         const options = query.options;
 
         // Check for stuck queries (disabled but pending)
+        // Note: enabled property removed in TanStack Query v5, check fetchStatus instead
         if (
           isQueryStuck(
             state.status,
             state.fetchStatus,
             state.dataUpdatedAt,
-            options.enabled !== false
+            state.fetchStatus !== 'paused'
           )
         ) {
           // Cancel and mark as error

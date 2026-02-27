@@ -4,7 +4,7 @@ import { Security, VisibilityOff } from '@mui/icons-material';
 
 interface AnonymousBadgeProps {
   isAnonymous: boolean;
-  variant?: 'default' | 'outlined' | 'filled';
+  variant?: 'outlined' | 'filled';
   size?: 'small' | 'medium';
   showIcon?: boolean;
 }

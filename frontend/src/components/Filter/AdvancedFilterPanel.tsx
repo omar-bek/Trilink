@@ -23,9 +23,9 @@ import {
   Clear,
   Save,
 } from '@mui/icons-material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+// import { DatePicker } from '@mui/x-date-pickers/DatePicker'; // Package not installed
+// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 export interface FilterOption {
   value: string;
@@ -300,20 +300,24 @@ export const AdvancedFilterPanel = ({
             {/* Date Range */}
             {config.dateRange && (
               <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DatePicker
-                    label={config.dateRange.startLabel || 'Start Date'}
-                    value={filters.startDate || null}
-                    onChange={(date) => handleFilterChange('startDate', date)}
-                    slotProps={{ textField: { size: 'small', sx: { minWidth: 200 } } }}
-                  />
-                  <DatePicker
-                    label={config.dateRange.endLabel || 'End Date'}
-                    value={filters.endDate || null}
-                    onChange={(date) => handleFilterChange('endDate', date)}
-                    slotProps={{ textField: { size: 'small', sx: { minWidth: 200 } } }}
-                  />
-                </LocalizationProvider>
+                <TextField
+                  type="date"
+                  label={config.dateRange.startLabel || 'Start Date'}
+                  value={filters.startDate ? (filters.startDate instanceof Date ? filters.startDate.toISOString().split('T')[0] : String(filters.startDate)) : ''}
+                  onChange={(e) => handleFilterChange('startDate', e.target.value ? new Date(e.target.value) : null)}
+                  InputLabelProps={{ shrink: true }}
+                  size="small"
+                  sx={{ minWidth: 200 }}
+                />
+                <TextField
+                  type="date"
+                  label={config.dateRange.endLabel || 'End Date'}
+                  value={filters.endDate ? (filters.endDate instanceof Date ? filters.endDate.toISOString().split('T')[0] : String(filters.endDate)) : ''}
+                  onChange={(e) => handleFilterChange('endDate', e.target.value ? new Date(e.target.value) : null)}
+                  InputLabelProps={{ shrink: true }}
+                  size="small"
+                  sx={{ minWidth: 200 }}
+                />
               </Box>
             )}
 

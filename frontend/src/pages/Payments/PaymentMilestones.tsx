@@ -8,12 +8,13 @@ import {
 import { usePayments } from '@/hooks/usePayments';
 import { MilestoneView } from '@/components/Payment/MilestoneView';
 import { PageSkeleton } from '@/components/LoadingSkeleton/LoadingSkeleton';
+import { normalizeResponse } from '@/utils/responseHelpers';
 
 export const PaymentMilestones = () => {
   const { contractId } = useParams<{ contractId: string }>();
 
   const { data, isLoading, error } = usePayments();
-  const payments = data?.data || [];
+  const payments = normalizeResponse(data?.data);
 
   // Filter payments by contract if contractId provided
   const contractPayments = contractId

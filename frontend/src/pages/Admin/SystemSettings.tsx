@@ -97,7 +97,7 @@ export const SystemSettings = () => {
     reset,
     formState: { errors, isDirty },
   } = useForm<SystemSettingsForm>({
-    resolver: yupResolver(settingsSchema),
+    resolver: yupResolver(settingsSchema) as any,
     defaultValues: {
       siteName: 'TriLink Platform',
       siteDescription: 'Government Procurement Platform',

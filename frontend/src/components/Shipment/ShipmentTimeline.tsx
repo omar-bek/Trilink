@@ -132,7 +132,8 @@ export const ShipmentTimeline = ({ shipment }: ShipmentTimelineProps) => {
         description: event.description,
         rejectionReason: event.rejectionReason,
         customsAuthority: event.customsAuthority,
-        color,
+        color: color as 'primary' | 'secondary' | 'inherit' | 'grey' | 'error' | 'warning' | 'info' | 'success',
+        status: event.status,
       };
     }) || [];
 
@@ -152,7 +153,7 @@ export const ShipmentTimeline = ({ shipment }: ShipmentTimelineProps) => {
           </Typography>
         </TimelineOppositeContent>
         <TimelineSeparator>
-          <TimelineDot color={event.color}>
+          <TimelineDot color={event.color as 'primary' | 'secondary' | 'inherit' | 'grey' | 'error' | 'warning' | 'info' | 'success'}>
             <EventIcon fontSize="small" />
           </TimelineDot>
           {index < allEvents.length - 1 && <TimelineConnector />}

@@ -80,7 +80,7 @@ export const EditPurchaseRequest = () => {
     trigger,
     reset,
   } = useForm<UpdatePurchaseRequestDto>({
-    resolver: yupResolver(validationSchema),
+    resolver: yupResolver(validationSchema) as any,
     defaultValues: {
       categoryId: '',
       subCategoryId: '',

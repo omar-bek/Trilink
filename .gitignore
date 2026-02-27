@@ -1,7 +1,38 @@
 node_modules/
 dist/
 .env
+.env.local
+.env.production
+.env.staging
 *.log
 .DS_Store
 coverage/
 *.tsbuildinfo
+
+# Docker
+.dockerignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+
+# Build outputs
+build/
+.next/
+out/
+
+# Testing
+.nyc_output/
+.jest/
+
+# Misc
+*.pem
+*.key
+*.crt
+.env.backup

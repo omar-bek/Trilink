@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import { logger } from '../utils/logger';
 import { CompanyCategory } from '../modules/company-categories/schema';
 import { PurchaseRequest } from '../modules/purchase-requests/schema';

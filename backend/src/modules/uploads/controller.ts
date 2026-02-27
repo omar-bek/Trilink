@@ -101,7 +101,21 @@ export class UploadController {
         return;
       }
 
-      const files = Array.isArray(req.files) ? req.files : [req.files];
+      // Handle different file input formats
+      let files: Express.Multer.File[] = [];
+      if (Array.isArray(req.files)) {
+        files = req.files;
+      } else if (req.files) {
+        // Check if it's a single file or an object with multiple files
+        if ('fieldname' in req.files && 'originalname' in req.files) {
+          // Single File
+          files = [req.files as unknown as Express.Multer.File];
+        } else {
+          // Handle { [fieldname: string]: File[]; } format
+          files = Object.values(req.files).flat();
+        }
+      }
+      
       const uploads = await Promise.all(
         files.map((file) =>
           this.service.uploadFile(

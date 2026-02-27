@@ -352,7 +352,7 @@ export class ContractPdfService {
   /**
    * Add footer
    */
-  private addFooter(doc: PDFKit.PDFDocument, contract: any): void {
+  private addFooter(doc: PDFKit.PDFDocument, _contract: any): void {
     const pageHeight = doc.page.height;
     const pageWidth = doc.page.width;
     const footerY = pageHeight - 50;

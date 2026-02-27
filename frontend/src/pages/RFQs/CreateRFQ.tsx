@@ -33,6 +33,7 @@ import { CreateRFQDto, RFQItem, DeliveryLocation, RFQType } from '@/types/rfq';
 import { Role } from '@/types';
 import { usePurchaseRequests } from '@/hooks/usePurchaseRequests';
 import { AnonymousToggle } from '@/components/Anonymity/AnonymousToggle';
+import { normalizeResponse } from '@/utils/responseHelpers';
 
 const steps = ['Basic Information', 'Items', 'Budget & Delivery', 'Target & Settings'];
 
@@ -80,7 +81,7 @@ export const CreateRFQ = () => {
   const { data: rfqData } = useRFQ(id);
   const rfq = rfqData?.data;
   const { data: purchaseRequestsData } = usePurchaseRequests();
-  const purchaseRequests = purchaseRequestsData?.data || [];
+  const purchaseRequests = normalizeResponse(purchaseRequestsData?.data);
 
   const {
     control,
@@ -90,7 +91,7 @@ export const CreateRFQ = () => {
     trigger,
     reset,
   } = useForm<CreateRFQDto>({
-    resolver: yupResolver(validationSchema),
+    resolver: yupResolver(validationSchema) as any,
     defaultValues: {
       purchaseRequestId: purchaseRequestId || '',
       type: RFQType.SUPPLIER,

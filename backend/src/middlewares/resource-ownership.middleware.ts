@@ -81,7 +81,9 @@ export const requireResourceOwnership = <T extends { companyId: string | { toStr
       const resourceCompanyId = resource[companyIdField as keyof T];
       const resourceCompanyIdStr = typeof resourceCompanyId === 'string' 
         ? resourceCompanyId 
-        : resourceCompanyId.toString();
+        : (resourceCompanyId && typeof resourceCompanyId === 'object' && 'toString' in resourceCompanyId)
+          ? resourceCompanyId.toString()
+          : String(resourceCompanyId);
 
       // Check ownership
       if (resourceCompanyIdStr !== userCompanyId) {

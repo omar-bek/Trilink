@@ -36,7 +36,7 @@ const stageLabels: Record<PaymentStage, string> = {
   failed: 'Failed',
 };
 
-const stageIcons: Record<PaymentStage, React.ReactNode> = {
+const stageIcons: Record<PaymentStage, React.ReactElement> = {
   pending: <Schedule />,
   approved: <CheckCircle />,
   processing: <Payment />,

@@ -6,6 +6,7 @@ interface KPICardProps {
   value: string | number;
   icon: ReactNode;
   color?: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
+  subtitle?: string;
   trend?: {
     value: number;
     label: string;
@@ -19,6 +20,7 @@ export const KPICard = ({
   value,
   icon,
   color = 'primary',
+  subtitle,
   trend,
   loading = false,
   onClick,
@@ -46,10 +48,23 @@ export const KPICard = ({
             <Typography
               variant="h4"
               component="div"
-              sx={{ fontWeight: 700, mb: trend ? 1.5 : 0, color: '#FFFFFF' }}
+              sx={{ fontWeight: 700, mb: (trend || subtitle) ? 1.5 : 0, color: '#FFFFFF' }}
             >
               {loading ? <Skeleton width={80} /> : value}
             </Typography>
+            {subtitle && !loading && (
+              <Typography
+                variant="caption"
+                sx={{
+                  color: '#CBD5E1',
+                  fontWeight: 400,
+                  display: 'block',
+                  mb: trend ? 0.5 : 0,
+                }}
+              >
+                {subtitle}
+              </Typography>
+            )}
             {trend && !loading && (
               <Typography
                 variant="caption"

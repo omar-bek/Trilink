@@ -64,7 +64,6 @@ export class NotificationScheduler {
     try {
       const now = new Date();
       const oneDayFromNow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-      const twoHoursFromNow = new Date(now.getTime() + 2 * 60 * 60 * 1000);
 
       // Find RFQs with deadlines in the next 24 hours
       // Get all open RFQs and filter by deadline

@@ -27,6 +27,7 @@ import { useContracts } from '@/hooks/useContracts';
 import { useQuery } from '@tanstack/react-query';
 import { companyService } from '@/services/company.service';
 import { CompanyType } from '@/types/company';
+import { normalizeResponse } from '@/utils/responseHelpers';
 
 const steps = ['Contract & Logistics', 'Origin', 'Destination', 'Delivery Date'];
 
@@ -61,7 +62,7 @@ export const CreateShipment = () => {
   const [activeStep, setActiveStep] = useState(0);
   const createMutation = useCreateShipment();
   const { data: contractsData } = useContracts();
-  const contracts = contractsData?.data || [];
+  const contracts = normalizeResponse(contractsData?.data);
 
   // Fetch logistics companies
   const { data: logisticsData } = useQuery({
@@ -79,7 +80,7 @@ export const CreateShipment = () => {
     formState: { errors },
     trigger,
   } = useForm<CreateShipmentDto>({
-    resolver: yupResolver(validationSchema),
+    resolver: yupResolver(validationSchema) as any,
     defaultValues: {
       contractId: contractId || '',
       logisticsCompanyId: '',
@@ -165,7 +166,7 @@ export const CreateShipment = () => {
                     <InputLabel>Logistics Company</InputLabel>
                     <Select {...field} label="Logistics Company">
                       {logisticsCompanies.map((company) => (
-                        <MenuItem key={company._id} value={company._id}>
+                        <MenuItem key={company.id} value={company.id}>
                           {company.name}
                         </MenuItem>
                       ))}

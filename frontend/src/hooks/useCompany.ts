@@ -23,13 +23,6 @@ export const useCompany = (companyId: string) => {
       // Retry other errors up to 2 times
       return failureCount < 2;
     },
-    // Suppress 403 errors from being logged as they're expected in some cases
-    onError: (error: any) => {
-      // Only log unexpected errors
-      if (error?.response?.status !== 403 && import.meta.env.DEV) {
-        console.warn('Company fetch error:', error);
-      }
-    },
   });
 };
 

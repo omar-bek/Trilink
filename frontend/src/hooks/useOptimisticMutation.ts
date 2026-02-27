@@ -62,7 +62,7 @@ export function useOptimisticMutation<TData = any, TError = Error, TVariables = 
       }
 
       if (mutationOptions.onError) {
-        mutationOptions.onError(error, variables, context);
+        mutationOptions.onError(error, variables, undefined, context as any);
       }
     },
     onSettled: (data, error, variables, context) => {
@@ -72,7 +72,7 @@ export function useOptimisticMutation<TData = any, TError = Error, TVariables = 
       });
 
       if (mutationOptions.onSettled) {
-        mutationOptions.onSettled(data, error, variables, context);
+        mutationOptions.onSettled(data, error, variables, undefined, context as any);
       }
     },
   });

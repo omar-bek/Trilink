@@ -70,7 +70,7 @@ export const CompanyDetails = () => {
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  const company = companyData?.data;
+  const company = (companyData as any)?.data;
   const users = usersData?.data || [];
 
   if (isLoadingCompany) {

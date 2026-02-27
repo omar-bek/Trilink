@@ -16,7 +16,7 @@ export class PaymentRepository {
    * Optionally populate related documents
    */
   async findById(id: string, populate?: boolean): Promise<IPayment | null> {
-    let query = Payment.findOne({ _id: id, deletedAt: null });
+    let query: any = Payment.findOne({ _id: id, deletedAt: null });
     
     if (populate) {
       query = query
@@ -26,7 +26,7 @@ export class PaymentRepository {
         .populate('buyerId', 'email firstName lastName');
     }
     
-    return await query.exec();
+    return (await query.exec()) as IPayment | null;
   }
 
   /**

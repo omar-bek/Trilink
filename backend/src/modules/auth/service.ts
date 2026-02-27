@@ -290,6 +290,7 @@ export class AuthService {
       await emailService.sendEmail({
         to: { email: user.email, name: userName },
         subject: 'Password Reset Request - TriLink Platform',
+        template: 'password-reset',
         data: {
           html: emailHtml,
           text: emailText,

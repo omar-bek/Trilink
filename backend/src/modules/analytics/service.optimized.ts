@@ -204,7 +204,6 @@ export class OptimizedAnalyticsService {
     // Process Bids
     const bidFacet = bidData[0] || {};
     const bidTotal = bidFacet.total?.[0]?.count || 0;
-    const bidByStatus = this.arrayToRecord(bidFacet.byStatus || [], 'status', 'count');
     const bidStats = bidFacet.stats?.[0] || {};
     const bidTotalSubmitted = bidStats.totalSubmitted || 0;
     const bidTotalAccepted = bidStats.totalAccepted || 0;
@@ -380,9 +379,10 @@ export class OptimizedAnalyticsService {
     }
 
     if (filters.startDate || filters.endDate) {
-      match.createdAt = {};
-      if (filters.startDate) match.createdAt.$gte = filters.startDate;
-      if (filters.endDate) match.createdAt.$lte = filters.endDate;
+      const createdAtFilter: { $gte?: Date; $lte?: Date } = {};
+      if (filters.startDate) createdAtFilter.$gte = filters.startDate;
+      if (filters.endDate) createdAtFilter.$lte = filters.endDate;
+      match.createdAt = createdAtFilter;
     }
 
     const cursor = Contract.find(match).lean().cursor();
@@ -408,9 +408,10 @@ export class OptimizedAnalyticsService {
     }
 
     if (filters.startDate || filters.endDate) {
-      match.createdAt = {};
-      if (filters.startDate) match.createdAt.$gte = filters.startDate;
-      if (filters.endDate) match.createdAt.$lte = filters.endDate;
+      const createdAtFilter: { $gte?: Date; $lte?: Date } = {};
+      if (filters.startDate) createdAtFilter.$gte = filters.startDate;
+      if (filters.endDate) createdAtFilter.$lte = filters.endDate;
+      match.createdAt = createdAtFilter;
     }
 
     const cursor = Payment.find(match).lean().cursor();
@@ -430,9 +431,10 @@ export class OptimizedAnalyticsService {
     }
 
     if (filters.startDate || filters.endDate) {
-      match.createdAt = {};
-      if (filters.startDate) match.createdAt.$gte = filters.startDate;
-      if (filters.endDate) match.createdAt.$lte = filters.endDate;
+      const createdAtFilter: { $gte?: Date; $lte?: Date } = {};
+      if (filters.startDate) createdAtFilter.$gte = filters.startDate;
+      if (filters.endDate) createdAtFilter.$lte = filters.endDate;
+      match.createdAt = createdAtFilter;
     }
 
     return match;

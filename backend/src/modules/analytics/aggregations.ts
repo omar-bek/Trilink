@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { PipelineStage } from 'mongoose';
 
 export interface DateRange {
   startDate?: Date;
@@ -56,7 +56,7 @@ export const purchaseRequestAggregations = {
   /**
    * Get KPIs: total count, by status, by month
    */
-  getKPIs: (filters: AnalyticsFilters) => {
+  getKPIs: (filters: AnalyticsFilters): PipelineStage[] => {
     const match = buildBaseMatch(filters);
 
     return [
@@ -110,7 +110,7 @@ export const contractAggregations = {
   /**
    * Get KPIs: total count, by status, total value, average value
    */
-  getKPIs: (filters: AnalyticsFilters) => {
+  getKPIs: (filters: AnalyticsFilters): PipelineStage[] => {
     const match: Record<string, unknown> = {
       deletedAt: null,
     };
@@ -187,7 +187,7 @@ export const bidAggregations = {
   /**
    * Get KPIs: total count, by status, acceptance rate, average AI score
    */
-  getKPIs: (filters: AnalyticsFilters) => {
+  getKPIs: (filters: AnalyticsFilters): PipelineStage[] => {
     const match = buildBaseMatch(filters);
 
     return [
@@ -240,7 +240,7 @@ export const paymentAggregations = {
   /**
    * Get KPIs: total amount, by status, pending amount
    */
-  getKPIs: (filters: AnalyticsFilters) => {
+  getKPIs: (filters: AnalyticsFilters): PipelineStage[] => {
     const match: Record<string, unknown> = {
       deletedAt: null,
     };
@@ -339,7 +339,7 @@ export const disputeAggregations = {
   /**
    * Get KPIs: total count, escalated count, resolution rate
    */
-  getKPIs: (filters: AnalyticsFilters) => {
+  getKPIs: (filters: AnalyticsFilters): PipelineStage[] => {
     const match = buildBaseMatch(filters);
 
     return [
@@ -443,7 +443,7 @@ export const rfqAggregations = {
   /**
    * Get KPIs: total count, by status, by type
    */
-  getKPIs: (filters: AnalyticsFilters) => {
+  getKPIs: (filters: AnalyticsFilters): PipelineStage[] => {
     const match = buildBaseMatch(filters);
 
     return [

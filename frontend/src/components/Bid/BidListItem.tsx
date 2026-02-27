@@ -24,6 +24,7 @@ import { AIScoreIndicator } from './AIScoreIndicator';
 import { formatCurrency, formatDate } from '@/utils';
 import { useAuthStore } from '@/store/auth.store';
 import { Role } from '@/types';
+import { normalizeAiMetadata } from '@/utils/bidHelpers';
 
 interface BidListItemProps {
   bid: Bid;
@@ -111,19 +112,7 @@ export const BidListItem = ({ bid, onWithdraw }: BidListItemProps) => {
                 <AIScoreIndicator
                   score={bid.aiScore}
                   showLabel={false}
-                  aiMetadata={bid.aiScoreMetadata
-                    ? {
-                        totalScore: bid.aiScoreMetadata.totalScore,
-                        breakdown: bid.aiScoreMetadata.breakdown,
-                        overallConfidence: bid.aiScoreMetadata.overallConfidence as 'high' | 'medium' | 'low',
-                        overallRisk: bid.aiScoreMetadata.overallRisk as 'low' | 'medium' | 'high',
-                        recommendation: bid.aiScoreMetadata.recommendation,
-                        timestamp: bid.aiScoreMetadata.timestamp
-                          ? new Date(bid.aiScoreMetadata.timestamp)
-                          : undefined,
-                        modelVersion: bid.aiScoreMetadata.modelVersion,
-                      }
-                    : undefined}
+                  aiMetadata={normalizeAiMetadata(bid.aiScoreMetadata)}
                 />
               )}
             </Box>

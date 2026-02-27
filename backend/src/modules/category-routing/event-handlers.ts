@@ -2,7 +2,6 @@ import { categoryEventEmitter, CategoryEvent } from './events';
 import { CategoryCacheService } from './cache.service';
 import { logger } from '../../utils/logger';
 import { CategoryRoutingQueueService } from './queue.service';
-import { PurchaseRequestRepository } from '../purchase-requests/repository';
 
 /**
  * Category Routing Event Handlers
@@ -11,12 +10,10 @@ import { PurchaseRequestRepository } from '../purchase-requests/repository';
 export class CategoryRoutingEventHandlers {
   private cacheService: CategoryCacheService;
   private queueService: CategoryRoutingQueueService;
-  private prRepository: PurchaseRequestRepository;
 
   constructor() {
     this.cacheService = new CategoryCacheService();
     this.queueService = new CategoryRoutingQueueService();
-    this.prRepository = new PurchaseRequestRepository();
     this.setupHandlers();
   }
 
