@@ -54,6 +54,18 @@ const startServer = async (): Promise<void> => {
       console.log(`🔌 Socket.io ready`);
     });
 
+    // Handle server errors
+    httpServer.on('error', (error: NodeJS.ErrnoException) => {
+      if (error.code === 'EADDRINUSE') {
+        logger.error(`Port ${config.port} is already in use`);
+        console.error(`❌ Port ${config.port} is already in use`);
+        process.exit(1);
+      } else {
+        logger.error('HTTP Server error:', error);
+        console.error('HTTP Server error:', error);
+      }
+    });
+
     // ===== Graceful Shutdown =====
     const gracefulShutdown = async (signal: string) => {
       console.log(`\n${signal} received. Shutting down...`);
@@ -71,11 +83,14 @@ const startServer = async (): Promise<void> => {
     process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
     process.on('SIGINT', () => gracefulShutdown('SIGINT'));
     process.on('unhandledRejection', (reason) => {
+      logger.error('Unhandled Rejection:', reason);
       console.error('Unhandled Rejection:', reason);
       gracefulShutdown('unhandledRejection');
     });
     process.on('uncaughtException', (error) => {
+      logger.error('Uncaught Exception:', error);
       console.error('Uncaught Exception:', error);
+      console.error('Error stack:', error.stack);
       gracefulShutdown('uncaughtException');
     });
   } catch (error) {

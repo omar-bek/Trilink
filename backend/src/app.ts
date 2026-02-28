@@ -8,6 +8,7 @@ import fs from 'fs';
 import { config } from './config/env';
 import { errorHandler, notFoundHandler } from './middlewares/error.middleware';
 import { setupSwagger } from './config/swagger';
+import { logger } from './utils/logger';
 import routes from './routes';
 
 /**
@@ -63,32 +64,80 @@ export const createApp = (): Express => {
 
   // ===== Frontend static files (React build) =====
   // Serve static files from frontend/dist
-  const frontendPath = path.resolve(__dirname, '../../frontend/dist');
+  // Try multiple possible paths for different deployment scenarios
+  let frontendPath: string;
+  
+  // Path 1: From dist/ (production compiled) -> ../frontend/dist
+  const path1 = path.resolve(__dirname, '../frontend/dist');
+  // Path 2: From dist/ -> ../../frontend/dist (if backend and frontend are siblings)
+  const path2 = path.resolve(__dirname, '../../frontend/dist');
+  // Path 3: Environment variable override (for production servers)
+  const path3 = process.env.FRONTEND_DIST_PATH 
+    ? path.resolve(process.env.FRONTEND_DIST_PATH)
+    : null;
+  
+  // Check which path exists
+  if (path3 && fs.existsSync(path.join(path3, 'index.html'))) {
+    frontendPath = path3;
+  } else if (fs.existsSync(path.join(path1, 'index.html'))) {
+    frontendPath = path1;
+  } else if (fs.existsSync(path.join(path2, 'index.html'))) {
+    frontendPath = path2;
+  } else {
+    // Default to path2 (most common structure)
+    frontendPath = path2;
+  }
   
   // Log frontend path for debugging
-  if (config.nodeEnv === 'development') {
-    console.log('📁 Frontend path:', frontendPath);
-    console.log('📄 Index.html exists:', fs.existsSync(path.join(frontendPath, 'index.html')));
+  console.log('📁 Frontend path:', frontendPath);
+  console.log('📄 Index.html exists:', fs.existsSync(path.join(frontendPath, 'index.html')));
+  
+  if (!fs.existsSync(path.join(frontendPath, 'index.html'))) {
+    console.warn('⚠️  Warning: Frontend index.html not found at:', frontendPath);
+    console.warn('   Tried paths:');
+    console.warn('     -', path1);
+    console.warn('     -', path2);
+    if (path3) console.warn('     -', path3);
+    console.warn('   Set FRONTEND_DIST_PATH environment variable to specify custom path');
   }
   
   // Serve static assets (JS, CSS, images, etc.)
-  app.use(express.static(frontendPath, {
-    maxAge: '1y', // Cache static assets for 1 year
-    etag: true,
-  }));
+  try {
+    app.use(express.static(frontendPath, {
+      maxAge: '1y', // Cache static assets for 1 year
+      etag: true,
+    }));
+  } catch (error) {
+    console.error('Failed to setup static file serving:', error);
+    logger.error('Failed to setup static file serving:', error);
+  }
 
   // Serve index.html for all non-API routes (SPA fallback)
   // This must be after API routes and static files, but before error handlers
   app.get('*', (req, res, next) => {
-    // Skip API routes
-    if (req.path.startsWith('/api')) {
-      return next();
+    try {
+      // Skip API routes
+      if (req.path.startsWith('/api')) {
+        return next();
+      }
+      // Skip socket.io
+      if (req.path.startsWith('/socket.io')) {
+        return next();
+      }
+      // Skip health check
+      if (req.path === '/health') {
+        return next();
+      }
+      const indexPath = path.join(frontendPath, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        next();
+      }
+    } catch (error) {
+      console.error('Error serving index.html:', error);
+      next(error);
     }
-    // Skip socket.io
-    if (req.path.startsWith('/socket.io')) {
-      return next();
-    }
-    res.sendFile(path.join(frontendPath, 'index.html'));
   });
 
   // ===== Error handling middleware (must be last) =====
