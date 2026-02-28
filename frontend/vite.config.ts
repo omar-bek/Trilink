@@ -24,26 +24,20 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: 'dist',
-      sourcemap: !isProduction, // Disable sourcemaps in production for security
+      sourcemap: !isProduction,
       minify: 'terser',
       terserOptions: {
         compress: {
-          drop_console: isProduction, // Remove console.log in production
+          drop_console: isProduction,
           drop_debugger: isProduction,
         },
       },
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-            'mui-vendor': ['@mui/material', '@mui/icons-material', '@emotion/react', '@emotion/styled'],
-            'query-vendor': ['@tanstack/react-query'],
-            'chart-vendor': ['recharts'],
-          },
-        },
-      },
+      base: '/', // Use absolute paths for production
+      // Let Vite automatically handle chunking
+      // This prevents circular dependency issues and React/MUI initialization errors
+      // Vite's automatic chunking is smart enough to optimize bundle size
       chunkSizeWarningLimit: 1000,
-      reportCompressedSize: false, // Faster builds
+      reportCompressedSize: false,
     },
     optimizeDeps: {
       include: ['react', 'react-dom', 'react-router-dom'],
