@@ -25,8 +25,36 @@ export const createApp = (): Express => {
   );
   app.use(
     cors({
-      origin: config.cors.origin,
+      origin: (origin, callback) => {
+        // Allow requests with no origin (mobile apps, Postman, curl, etc.)
+        if (!origin) {
+          return callback(null, true);
+        }
+
+        // Parse allowed origins (comma-separated or single value)
+        const allowedOrigins = config.cors.origin
+          ? config.cors.origin.split(',').map((o) => o.trim())
+          : ['http://localhost:3000', 'http://localhost:3001'];
+
+        // Check if origin is allowed
+        if (allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          // In development, allow all localhost origins
+          if (config.nodeEnv === 'development' && origin.includes('localhost')) {
+            callback(null, true);
+          } else {
+            // Log blocked origin for debugging
+            logger.warn(`CORS blocked origin: ${origin}. Allowed origins: ${allowedOrigins.join(', ')}`);
+            callback(new Error(`Not allowed by CORS. Origin: ${origin}`));
+          }
+        }
+      },
       credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+      exposedHeaders: ['Content-Range', 'X-Content-Range'],
+      maxAge: 86400, // 24 hours
     })
   );
 

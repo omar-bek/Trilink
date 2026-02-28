@@ -12,7 +12,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.string().regex(/^\d+$/).transform(Number).default('3000'),
   MONGODB_URI: z.string().url().min(1),
-  CORS_ORIGIN: z.string().url().optional().default('http://localhost:3000'),
+  CORS_ORIGIN: z.string().optional().default('http://localhost:3000'),
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).optional().default('info'),
   JWT_SECRET: z.string().min(32).default('test-jwt-secret-min-32-chars-for-testing-only'),
   JWT_REFRESH_SECRET: z.string().min(32).default('test-jwt-refresh-secret-min-32-chars-for-testing'),
