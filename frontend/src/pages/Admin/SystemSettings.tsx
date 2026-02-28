@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -15,6 +15,8 @@ import {
   Paper,
   Tabs,
   Tab,
+  Avatar,
+  CircularProgress,
 } from '@mui/material';
 import {
   Save as SaveIcon,
@@ -24,15 +26,32 @@ import {
   Email as EmailIcon,
   Storage as StorageIcon,
   Settings as SettingsIcon,
+  CloudUpload as CloudUploadIcon,
+  Image as ImageIcon,
 } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { useSettings, useUpdateSettings } from '@/hooks/useSettings';
+import api from '@/services/api';
+// FileCategory enum - matches backend
+enum FileCategory {
+  RFQ_ATTACHMENT = 'rfq_attachment',
+  BID_ATTACHMENT = 'bid_attachment',
+  DISPUTE_ATTACHMENT = 'dispute_attachment',
+  COMPANY_DOCUMENT = 'company_document',
+  CONTRACT_DOCUMENT = 'contract_document',
+  CUSTOMS_DOCUMENT = 'customs_document',
+  PROFILE_IMAGE = 'profile_image',
+  PLATFORM_LOGO = 'platform_logo',
+  OTHER = 'other',
+}
 
 interface SystemSettingsForm {
   // General Settings
   siteName: string;
   siteDescription: string;
+  logo?: string;
   maintenanceMode: boolean;
   allowRegistration: boolean;
   
@@ -65,6 +84,7 @@ interface SystemSettingsForm {
 const settingsSchema = yup.object({
   siteName: yup.string().required('Site name is required'),
   siteDescription: yup.string().optional(),
+  logo: yup.string().optional(),
   maintenanceMode: yup.boolean().optional(),
   allowRegistration: yup.boolean().optional(),
   smtpHost: yup.string().optional(),
@@ -88,19 +108,25 @@ const settingsSchema = yup.object({
 
 export const SystemSettings = () => {
   const [activeTab, setActiveTab] = useState(0);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const { data: settingsData, isLoading } = useSettings();
+  const updateSettingsMutation = useUpdateSettings();
+
+  const settings = settingsData?.data;
 
   const {
     control,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isDirty },
   } = useForm<SystemSettingsForm>({
     resolver: yupResolver(settingsSchema) as any,
     defaultValues: {
       siteName: 'TriLink Platform',
       siteDescription: 'Government Procurement Platform',
+      logo: undefined,
       maintenanceMode: false,
       allowRegistration: true,
       smtpHost: '',
@@ -123,25 +149,125 @@ export const SystemSettings = () => {
     },
   });
 
-  const onSubmit = async (data: SystemSettingsForm) => {
-    setIsSaving(true);
-    setSaveSuccess(false);
-    
+  const logoUrl = watch('logo');
+
+  // Load settings when data is available
+  useEffect(() => {
+    if (settings) {
+      reset({
+        siteName: settings.siteName || 'TriLink Platform',
+        siteDescription: settings.siteDescription || 'Government Procurement Platform',
+        logo: settings.logo,
+        maintenanceMode: settings.maintenanceMode ?? false,
+        allowRegistration: settings.allowRegistration ?? true,
+        smtpHost: settings.smtpHost || '',
+        smtpPort: settings.smtpPort || 587,
+        smtpUser: settings.smtpUser || '',
+        smtpPassword: settings.smtpPassword || '',
+        fromEmail: settings.fromEmail || 'noreply@trilink.gov',
+        fromName: settings.fromName || 'TriLink Platform',
+        sessionTimeout: settings.sessionTimeout || 60,
+        maxLoginAttempts: settings.maxLoginAttempts || 5,
+        requireEmailVerification: settings.requireEmailVerification ?? true,
+        requireTwoFactor: settings.requireTwoFactor ?? false,
+        passwordMinLength: settings.passwordMinLength || 8,
+        enableEmailNotifications: settings.enableEmailNotifications ?? true,
+        enableSmsNotifications: settings.enableSmsNotifications ?? false,
+        enablePushNotifications: settings.enablePushNotifications ?? true,
+        maxFileSize: settings.maxFileSize || 10,
+        allowedFileTypes: settings.allowedFileTypes || 'pdf,doc,docx,xls,xlsx,jpg,jpeg,png',
+        storageProvider: settings.storageProvider || 'local',
+      });
+    }
+  }, [settings, reset]);
+
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size must be less than 5MB');
+      return;
+    }
+
+    setLogoUploading(true);
+
     try {
-      // TODO: Implement API call to save settings
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('category', 'platform_logo');
+      formData.append('description', 'Platform Logo');
+
+      const response = await api.post('/uploads/logo', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.data.success && response.data.data?.url) {
+        setValue('logo', response.data.data.url, { shouldDirty: true });
+      }
+    } catch (error: any) {
+      console.error('Failed to upload logo:', error);
+      alert(error.response?.data?.error || 'Failed to upload logo');
+    } finally {
+      setLogoUploading(false);
+      // Reset input
+      event.target.value = '';
+    }
+  };
+
+  const onSubmit = async (data: SystemSettingsForm) => {
+    try {
+      await updateSettingsMutation.mutateAsync(data);
     } catch (error) {
       console.error('Failed to save settings:', error);
-    } finally {
-      setIsSaving(false);
     }
   };
 
   const handleReset = () => {
-    reset();
+    if (settings) {
+      reset({
+        siteName: settings.siteName || 'TriLink Platform',
+        siteDescription: settings.siteDescription || 'Government Procurement Platform',
+        logo: settings.logo,
+        maintenanceMode: settings.maintenanceMode ?? false,
+        allowRegistration: settings.allowRegistration ?? true,
+        smtpHost: settings.smtpHost || '',
+        smtpPort: settings.smtpPort || 587,
+        smtpUser: settings.smtpUser || '',
+        smtpPassword: settings.smtpPassword || '',
+        fromEmail: settings.fromEmail || 'noreply@trilink.gov',
+        fromName: settings.fromName || 'TriLink Platform',
+        sessionTimeout: settings.sessionTimeout || 60,
+        maxLoginAttempts: settings.maxLoginAttempts || 5,
+        requireEmailVerification: settings.requireEmailVerification ?? true,
+        requireTwoFactor: settings.requireTwoFactor ?? false,
+        passwordMinLength: settings.passwordMinLength || 8,
+        enableEmailNotifications: settings.enableEmailNotifications ?? true,
+        enableSmsNotifications: settings.enableSmsNotifications ?? false,
+        enablePushNotifications: settings.enablePushNotifications ?? true,
+        maxFileSize: settings.maxFileSize || 10,
+        allowedFileTypes: settings.allowedFileTypes || 'pdf,doc,docx,xls,xlsx,jpg,jpeg,png',
+        storageProvider: settings.storageProvider || 'local',
+      });
+    }
   };
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box>
@@ -168,18 +294,13 @@ export const SystemSettings = () => {
             variant="contained"
             startIcon={<SaveIcon />}
             onClick={handleSubmit(onSubmit)}
-            disabled={isSaving || !isDirty}
+            disabled={updateSettingsMutation.isPending || !isDirty}
           >
-            {isSaving ? 'Saving...' : 'Save Changes'}
+            {updateSettingsMutation.isPending ? 'Saving...' : 'Save Changes'}
           </Button>
         </Stack>
       </Box>
 
-      {saveSuccess && (
-        <Alert severity="success" sx={{ mb: 3 }}>
-          Settings saved successfully!
-        </Alert>
-      )}
 
       {/* Tabs */}
       <Paper sx={{ mb: 3 }}>
@@ -228,9 +349,62 @@ export const SystemSettings = () => {
                         label="Site Description"
                         error={!!errors.siteDescription}
                         helperText={errors.siteDescription?.message}
+                        multiline
+                        rows={2}
                       />
                     )}
                   />
+                </Grid>
+                <Grid item xs={12}>
+                  <Divider sx={{ my: 2 }} />
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
+                    Platform Logo
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar
+                      src={logoUrl}
+                      sx={{ width: 80, height: 80, bgcolor: 'primary.main' }}
+                      variant="rounded"
+                    >
+                      {!logoUrl && <ImageIcon />}
+                    </Avatar>
+                    <Box>
+                      <input
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        id="logo-upload-button"
+                        type="file"
+                        onChange={handleLogoUpload}
+                        disabled={logoUploading}
+                      />
+                      <label htmlFor="logo-upload-button">
+                        <Button
+                          variant="outlined"
+                          component="span"
+                          startIcon={logoUploading ? <CircularProgress size={20} /> : <CloudUploadIcon />}
+                          disabled={logoUploading}
+                        >
+                          {logoUploading ? 'Uploading...' : logoUrl ? 'Change Logo' : 'Upload Logo'}
+                        </Button>
+                      </label>
+                      {logoUrl && (
+                        <Button
+                          variant="text"
+                          color="error"
+                          size="small"
+                          onClick={() => setValue('logo', undefined, { shouldDirty: true })}
+                          sx={{ ml: 1 }}
+                        >
+                          Remove
+                        </Button>
+                      )}
+                      <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
+                        Recommended size: 200x200px. Max file size: 5MB
+                      </Typography>
+                    </Box>
+                  </Box>
                 </Grid>
                 <Grid item xs={12}>
                   <Divider sx={{ my: 2 }} />

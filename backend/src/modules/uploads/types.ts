@@ -6,7 +6,7 @@ export interface UploadFileResponse {
   size: number;
   url: string;
   uploadedBy: string;
-  companyId: string;
+  companyId?: string; // Optional for platform-level uploads (e.g., logo)
   category: FileCategory;
   entityType?: 'rfq' | 'bid' | 'contract' | 'dispute';
   entityId?: string;
@@ -22,6 +22,7 @@ export enum FileCategory {
   CONTRACT_DOCUMENT = 'contract_document',
   CUSTOMS_DOCUMENT = 'customs_document',
   PROFILE_IMAGE = 'profile_image',
+  PLATFORM_LOGO = 'platform_logo',
   OTHER = 'other',
 }
 

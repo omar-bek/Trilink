@@ -27,18 +27,24 @@ export class UploadService {
     entityType?: 'rfq' | 'bid' | 'contract' | 'dispute',
     entityId?: string
   ): Promise<UploadFileResponse> {
-    // Upload to S3
-    const { key, bucket } = await this.s3Service.uploadFile(
-      file,
-      category,
-      companyId,
-      userId
-    );
+    try {
+      // Upload to S3
+      const { key, bucket } = await this.s3Service.uploadFile(
+        file,
+        category,
+        companyId,
+        userId
+      );
 
-    // Generate presigned URL (valid for 1 hour)
-    const url = await this.s3Service.getPresignedUrl(key, 3600);
+      // Generate presigned URL (valid for 1 hour)
+      const url = await this.s3Service.getPresignedUrl(key, 3600);
 
     // Create database record
+    // For platform logo, companyId might be 'system' string, handle it properly
+    const companyObjectId = companyId === 'system' 
+      ? undefined 
+      : new mongoose.Types.ObjectId(companyId);
+    
     const upload = await this.repository.create({
       fileName: file.filename || key.split('/').pop() || 'unknown',
       originalName: file.originalname,
@@ -52,10 +58,14 @@ export class UploadService {
       entityType,
       entityId: entityId ? new mongoose.Types.ObjectId(entityId) : undefined,
       uploadedBy: new mongoose.Types.ObjectId(userId),
-      companyId: new mongoose.Types.ObjectId(companyId),
+      companyId: companyObjectId,
     });
 
-    return this.toUploadResponse(upload);
+      return this.toUploadResponse(upload);
+    } catch (error: any) {
+      logger.error('Upload service error:', error);
+      throw error; // Re-throw to be handled by controller
+    }
   }
 
   /**
@@ -67,8 +77,8 @@ export class UploadService {
       throw new AppError('Upload not found', 404);
     }
 
-    // Enforce company isolation
-    if (requesterCompanyId && upload.companyId.toString() !== requesterCompanyId) {
+    // Enforce company isolation (skip for platform-level uploads without companyId)
+    if (requesterCompanyId && upload.companyId && upload.companyId.toString() !== requesterCompanyId) {
       throw new AppError('Access denied: Upload belongs to different company', 403);
     }
 
@@ -117,7 +127,7 @@ export class UploadService {
     // Enforce company isolation
     if (requesterCompanyId) {
       const filtered = uploads.filter(
-        (upload) => upload.companyId.toString() === requesterCompanyId
+        (upload) => upload.companyId && upload.companyId.toString() === requesterCompanyId
       );
       
       const uploadsWithUrls = await Promise.all(
@@ -159,8 +169,8 @@ export class UploadService {
       throw new AppError('Upload not found', 404);
     }
 
-    // Enforce company isolation
-    if (requesterCompanyId && upload.companyId.toString() !== requesterCompanyId) {
+    // Enforce company isolation (skip for platform-level uploads without companyId)
+    if (requesterCompanyId && upload.companyId && upload.companyId.toString() !== requesterCompanyId) {
       throw new AppError('Access denied: Upload belongs to different company', 403);
     }
 
@@ -186,8 +196,8 @@ export class UploadService {
       throw new AppError('Upload not found', 404);
     }
 
-    // Enforce company isolation
-    if (requesterCompanyId && upload.companyId.toString() !== requesterCompanyId) {
+    // Enforce company isolation (skip for platform-level uploads without companyId)
+    if (requesterCompanyId && upload.companyId && upload.companyId.toString() !== requesterCompanyId) {
       throw new AppError('Access denied: Upload belongs to different company', 403);
     }
 
@@ -215,7 +225,7 @@ export class UploadService {
       size: upload.size,
       url: upload.url,
       uploadedBy: upload.uploadedBy.toString(),
-      companyId: upload.companyId.toString(),
+      companyId: upload.companyId?.toString() || '',
       category: upload.category,
       entityType: upload.entityType,
       entityId: upload.entityId?.toString(),

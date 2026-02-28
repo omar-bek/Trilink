@@ -38,14 +38,20 @@ export class S3Service {
     userId: string
   ): Promise<{ key: string; bucket: string }> {
     if (!this.bucketName) {
-      throw new Error('S3 bucket not configured');
+      throw new Error('AWS S3 bucket not configured. Please set AWS_S3_BUCKET environment variable.');
+    }
+    
+    if (!config.aws?.accessKeyId || !config.aws?.secretAccessKey) {
+      throw new Error('AWS S3 credentials not configured. Please set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables.');
     }
 
     // Generate unique file key
     const timestamp = Date.now();
     const randomHash = crypto.randomBytes(8).toString('hex');
     const sanitizedFileName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const key = `uploads/${category}/${companyId}/${timestamp}-${randomHash}-${sanitizedFileName}`;
+    // For platform logo, use 'system' as companyId
+    const companyFolder = companyId === 'system' ? 'system' : companyId;
+    const key = `uploads/${category}/${companyFolder}/${timestamp}-${randomHash}-${sanitizedFileName}`;
 
     try {
       const command = new PutObjectCommand({
@@ -58,8 +64,8 @@ export class S3Service {
           companyId: companyId,
           originalName: file.originalname,
         },
-        // Set ACL to private (files are not publicly accessible)
-        ACL: 'private',
+        // Note: ACL removed as it may not be supported in all S3 buckets
+        // Files are private by default in S3
       });
 
       await this.s3Client.send(command);
@@ -70,9 +76,20 @@ export class S3Service {
         key,
         bucket: this.bucketName,
       };
-    } catch (error) {
+    } catch (error: any) {
       logger.error('S3 upload error:', error);
-      throw new Error('Failed to upload file to S3');
+      const errorMessage = error.message || 'Unknown S3 error';
+      
+      // Provide more specific error messages
+      if (errorMessage.includes('credentials') || errorMessage.includes('AccessDenied')) {
+        throw new Error('AWS S3 credentials are invalid or missing. Please configure AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY');
+      } else if (errorMessage.includes('NoSuchBucket') || errorMessage.includes('bucket')) {
+        throw new Error(`AWS S3 bucket "${this.bucketName}" does not exist. Please create the bucket or update AWS_S3_BUCKET environment variable`);
+      } else if (errorMessage.includes('region')) {
+        throw new Error(`AWS S3 region "${this.region}" is invalid. Please check AWS_REGION environment variable`);
+      } else {
+        throw new Error(`Failed to upload file to S3: ${errorMessage}`);
+      }
     }
   }
 

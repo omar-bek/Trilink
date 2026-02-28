@@ -14,7 +14,7 @@ export interface IUpload extends Document {
   entityType?: 'rfq' | 'bid' | 'contract' | 'dispute'; // Linked entity type
   entityId?: mongoose.Types.ObjectId; // Linked entity ID
   uploadedBy: mongoose.Types.ObjectId;
-  companyId: mongoose.Types.ObjectId;
+  companyId?: mongoose.Types.ObjectId; // Optional for platform-level uploads (e.g., logo)
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;
@@ -80,7 +80,7 @@ const uploadSchema = new Schema<IUpload>(
     companyId: {
       type: Schema.Types.ObjectId,
       ref: 'Company',
-      required: true,
+      required: false, // Optional for platform-level uploads (e.g., logo)
       index: true,
     },
     deletedAt: {

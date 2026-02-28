@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { UploadController } from './controller';
 import { authenticate } from '../../middlewares/auth.middleware';
-import { requirePermission } from '../../middlewares/rbac.middleware';
-import { Permission } from '../../config/rbac';
+import { requirePermission, requireRole } from '../../middlewares/rbac.middleware';
+import { Permission, Role } from '../../config/rbac';
 import { singleUpload, multipleUpload } from './multer.config';
 import { FileCategory } from './types';
 import { z } from 'zod';
@@ -35,7 +35,7 @@ const validateUpload = (req: any, res: any, next: any) => {
     const { category } = req.body;
     let maxSize = 10 * 1024 * 1024; // 10MB default
 
-    if (category === 'profile_image') {
+    if (category === 'profile_image' || category === 'platform_logo') {
       maxSize = 5 * 1024 * 1024; // 5MB
     }
 
@@ -61,13 +61,13 @@ const validateUpload = (req: any, res: any, next: any) => {
 };
 
 /**
- * Upload single file
- * POST /api/uploads
+ * Upload platform logo (Admin only) - MUST be before /:id route
+ * POST /api/uploads/logo
  */
 router.post(
-  '/',
+  '/logo',
   authenticate,
-  requirePermission(Permission.CREATE_BID), // Using existing permission, can add CREATE_UPLOAD later
+  requireRole(Role.ADMIN),
   singleUpload,
   validateUpload,
   controller.uploadFile
@@ -87,14 +87,16 @@ router.post(
 );
 
 /**
- * Get upload by ID
- * GET /api/uploads/:id
+ * Upload single file
+ * POST /api/uploads
  */
-router.get(
-  '/:id',
+router.post(
+  '/',
   authenticate,
-  requirePermission(Permission.VIEW_BID),
-  controller.getUploadById
+  requirePermission(Permission.CREATE_BID), // Using existing permission, can add CREATE_UPLOAD later
+  singleUpload,
+  validateUpload,
+  controller.uploadFile
 );
 
 /**
@@ -109,18 +111,7 @@ router.get(
 );
 
 /**
- * Delete upload
- * DELETE /api/uploads/:id
- */
-router.delete(
-  '/:id',
-  authenticate,
-  requirePermission(Permission.UPDATE_BID),
-  controller.deleteUpload
-);
-
-/**
- * Get uploads by entity
+ * Get uploads by entity - MUST be before /:id route
  * GET /api/uploads/entity/:entityType/:entityId
  */
 router.get(
@@ -131,7 +122,7 @@ router.get(
 );
 
 /**
- * Link upload to entity
+ * Link upload to entity - MUST be before /:id route
  * POST /api/uploads/:uploadId/link
  */
 router.post(
@@ -139,6 +130,28 @@ router.post(
   authenticate,
   requirePermission(Permission.UPDATE_BID),
   controller.linkUploadToEntity
+);
+
+/**
+ * Get upload by ID - MUST be last (catch-all)
+ * GET /api/uploads/:id
+ */
+router.get(
+  '/:id',
+  authenticate,
+  requirePermission(Permission.VIEW_BID),
+  controller.getUploadById
+);
+
+/**
+ * Delete upload
+ * DELETE /api/uploads/:id
+ */
+router.delete(
+  '/:id',
+  authenticate,
+  requirePermission(Permission.UPDATE_BID),
+  controller.deleteUpload
 );
 
 export default router;

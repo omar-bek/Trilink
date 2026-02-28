@@ -32,6 +32,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth.store';
 import { Role } from '@/types';
+import { usePublicSettings } from '@/hooks/useSettings';
 
 const DRAWER_WIDTH = 280;
 
@@ -92,6 +93,10 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthStore();
+  const { data: settingsData } = usePublicSettings();
+  const settings = settingsData?.data;
+  
+  const siteName = settings?.siteName || 'TriLink';
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -130,7 +135,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
         }}
       >
         <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 600 }}>
-          TriLink
+          {siteName}
         </Typography>
       </Toolbar>
       <Divider />
@@ -197,7 +202,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            {navItems.find((item) => location.pathname.startsWith(item.path))?.label || 'TriLink'}
+            {navItems.find((item) => location.pathname.startsWith(item.path))?.label || siteName}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' } }}>

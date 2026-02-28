@@ -16,6 +16,7 @@ import { Visibility, VisibilityOff, Email, Lock } from '@mui/icons-material';
 import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth.store';
 import { UAEGovernmentFlag, UAEGovernmentBadge } from '@/components/GovernmentBranding';
+import { usePublicSettings } from '@/hooks/useSettings';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -28,6 +29,11 @@ export const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const login = useAuthStore((state) => state.login);
+  const { data: settingsData } = usePublicSettings();
+  const settings = settingsData?.data;
+  
+  const siteName = settings?.siteName || 'TriLink';
+  const siteDescription = settings?.siteDescription || 'Digital Trade & Procurement Platform';
 
   const from = (location.state as any)?.from?.pathname || '/dashboard';
 
@@ -103,14 +109,16 @@ export const Login = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5, mb: 2 }}>
               <UAEGovernmentFlag size="large" variant="minimal" />
               <Typography component="h1" variant="h4" sx={{ fontWeight: 700, color: '#FFFFFF', letterSpacing: '0.5px' }}>
-                TriLink
+                {siteName}
               </Typography>
             </Box>
-            <Typography variant="body2" sx={{ color: '#CBD5E1', mb: 1.5 }}>
-              Digital Trade & Procurement Platform
-            </Typography>
+            {siteDescription && (
+              <Typography variant="body2" sx={{ color: '#CBD5E1', mb: 1.5 }}>
+                {siteDescription}
+              </Typography>
+            )}
             <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-              <UAEGovernmentBadge variant="official" size="small" />
+              <UAEGovernmentBadge variant="official" size="small" label={siteDescription} />
             </Box>
           </Box>
 

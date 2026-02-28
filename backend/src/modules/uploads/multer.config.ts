@@ -53,7 +53,8 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilt
   // Determine allowed MIME types based on category
   let allowedTypes: string[] = ALLOWED_MIME_TYPES.all;
 
-  if (category === 'profile_image') {
+  if (category === 'profile_image' || category === 'platform_logo' || category === 'other') {
+    // For logo and profile images, allow images only
     allowedTypes = ALLOWED_MIME_TYPES.image;
   } else if (
     category === 'bid_attachment' ||
@@ -106,7 +107,7 @@ export const validateFileSize = (
 ): boolean => {
   let maxSize = FILE_SIZE_LIMITS.default;
 
-  if (category === 'profile_image') {
+  if (category === 'profile_image' || category === 'platform_logo') {
     maxSize = FILE_SIZE_LIMITS.image;
   } else if (
     category === 'bid_attachment' ||

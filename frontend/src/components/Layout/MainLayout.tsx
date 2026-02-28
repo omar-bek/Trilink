@@ -37,6 +37,7 @@ import { UAEGovernmentFlag, UAEGovernmentBadge } from '@/components/GovernmentBr
 import { GovernmentComplianceFooter } from '@/components/GovernmentBranding/GovernmentComplianceFooter';
 import { NotificationPanel, Notification as NotificationType } from '@/components/DesignSystem';
 import { useNotifications } from '@/hooks/useNotifications';
+import { usePublicSettings } from '@/hooks/useSettings';
 // import { useNavigate } from 'react-router-dom';
 
 const DRAWER_WIDTH = 280;
@@ -55,6 +56,11 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthStore();
+  const { data: settingsData } = usePublicSettings();
+  const settings = settingsData?.data;
+  
+  const siteName = settings?.siteName || 'TriLink';
+  const siteDescription = settings?.siteDescription;
 
   // Fetch notifications
   const {
@@ -247,11 +253,11 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <UAEGovernmentFlag size="medium" variant="minimal" />
           <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700, color: '#FFFFFF', letterSpacing: '0.5px' }}>
-            TriLink
+            {siteName}
           </Typography>
         </Box>
         <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
-          <UAEGovernmentBadge variant="official" size="small" />
+          <UAEGovernmentBadge variant="official" size="small" label={siteDescription} />
         </Box>
       </Toolbar>
       <Divider />

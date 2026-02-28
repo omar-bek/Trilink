@@ -3,6 +3,7 @@ import { UploadService } from './service';
 import { UploadFileDto, FileCategory } from './types';
 import { ApiResponse } from '../../types/common';
 import { getRequestId } from '../../utils/requestId';
+import { logger } from '../../utils/logger';
 
 export class UploadController {
   private service: UploadService;
@@ -18,11 +19,16 @@ export class UploadController {
   uploadFile = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    _next: NextFunction
   ): Promise<void> => {
     try {
       if (!req.user) {
-        throw new Error('User not authenticated');
+        res.status(401).json({
+          success: false,
+          error: 'User not authenticated',
+          requestId: getRequestId(req),
+        });
+        return;
       }
 
       if (!req.file) {
@@ -39,17 +45,22 @@ export class UploadController {
       if (!category || !Object.values(FileCategory).includes(category as FileCategory)) {
         res.status(400).json({
           success: false,
-          error: 'Invalid file category',
+          error: `Invalid file category. Allowed categories: ${Object.values(FileCategory).join(', ')}`,
           requestId: getRequestId(req),
         });
         return;
       }
 
+      // For platform logo, companyId can be undefined (admin upload)
+      const companyId = req.user.companyId || 'system';
+      
+      logger.info(`Uploading file: category=${category}, companyId=${companyId}, userId=${req.user.userId}`);
+      
       const upload = await this.service.uploadFile(
         req.file,
         category as FileCategory,
         req.user.userId,
-        req.user.companyId,
+        companyId,
         description,
         entityType,
         entityId
@@ -62,8 +73,16 @@ export class UploadController {
       };
 
       res.status(201).json(response);
-    } catch (error) {
-      next(error);
+    } catch (error: any) {
+      logger.error('Upload file error:', error);
+      const errorMessage = error.message || 'Failed to upload file';
+      const statusCode = error.statusCode || 500;
+      
+      res.status(statusCode).json({
+        success: false,
+        error: errorMessage,
+        requestId: getRequestId(req),
+      });
     }
   };
 

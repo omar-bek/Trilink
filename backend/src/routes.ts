@@ -17,7 +17,9 @@ import notificationRoutes from './modules/notifications/routes';
 import categoryRoutes from './modules/categories/routes';
 import companyCategoryRoutes from './modules/company-categories/routes';
 import categoryRoutingRoutes from './modules/category-routing/routes';
+import settingsRoutes from './modules/settings/routes';
 import { auditMiddleware } from './middlewares/audit.middleware';
+import { logger } from './utils/logger';
 
 const router = Router();
 
@@ -43,6 +45,10 @@ router.use('/notifications', notificationRoutes);
 router.use('/categories', categoryRoutes);
 router.use('/companies', companyCategoryRoutes);
 router.use('/category-routing', categoryRoutingRoutes);
+router.use('/settings', settingsRoutes);
+
+// Log settings routes registration
+logger.info('Settings routes registered at /api/settings');
 
 // Health check endpoint
 router.get('/health', (_req, res) => {

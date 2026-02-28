@@ -19,7 +19,7 @@ export class UploadRepository {
     entityType?: 'rfq' | 'bid' | 'contract' | 'dispute';
     entityId?: mongoose.Types.ObjectId;
     uploadedBy: mongoose.Types.ObjectId;
-    companyId: mongoose.Types.ObjectId;
+    companyId?: mongoose.Types.ObjectId; // Optional for platform-level uploads (e.g., logo)
   }): Promise<IUpload> {
     const upload = new Upload(data);
     return upload.save();

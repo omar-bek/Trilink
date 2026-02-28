@@ -11,23 +11,24 @@ interface UAEGovernmentBadgeProps {
   variant?: 'official' | 'verified' | 'compliance';
   size?: 'small' | 'medium';
   showIcon?: boolean;
+  label?: string; // Optional custom label from settings
 }
 
 const badgeConfig = {
   official: {
-    label: 'Official Government Platform',
+    defaultLabel: 'Official Government Platform',
     color: '#00843D',
     bgColor: 'rgba(0, 132, 61, 0.1)',
     borderColor: 'rgba(0, 132, 61, 0.2)',
   },
   verified: {
-    label: 'UAE Government Verified',
+    defaultLabel: 'UAE Government Verified',
     color: '#00843D',
     bgColor: 'rgba(0, 132, 61, 0.08)',
     borderColor: 'rgba(0, 132, 61, 0.15)',
   },
   compliance: {
-    label: 'Government Compliant',
+    defaultLabel: 'Government Compliant',
     color: '#1E40AF',
     bgColor: 'rgba(30, 64, 175, 0.08)',
     borderColor: 'rgba(30, 64, 175, 0.15)',
@@ -37,14 +38,16 @@ const badgeConfig = {
 export const UAEGovernmentBadge = ({ 
   variant = 'official',
   size = 'small',
-  showIcon = true 
+  showIcon = true,
+  label
 }: UAEGovernmentBadgeProps) => {
   const config = badgeConfig[variant];
+  const displayLabel = label || config.defaultLabel;
 
   return (
     <Chip
       icon={showIcon ? <Verified sx={{ fontSize: 14, color: config.color }} /> : undefined}
-      label={config.label}
+      label={displayLabel}
       size={size}
       sx={{
         bgcolor: config.bgColor,
@@ -60,7 +63,7 @@ export const UAEGovernmentBadge = ({
           marginLeft: '8px',
         },
       }}
-      title={`TriLink is the ${config.label.toLowerCase()} of the United Arab Emirates`}
+      title={`${displayLabel}`}
     />
   );
 };
