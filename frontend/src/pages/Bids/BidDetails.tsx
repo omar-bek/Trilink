@@ -32,6 +32,7 @@ import {
   CompareArrows,
 } from '@mui/icons-material';
 import { useBid, useWithdrawBid, useEvaluateBid, useUpdateBid, useDeleteBid, useRevealBidIdentity, useBidsByRFQ } from '@/hooks/useBids';
+import { useRFQ } from '@/hooks/useRFQs';
 import { BidStatusBadge } from '@/components/Bid/BidStatusBadge';
 import { EnhancedStatusBadge } from '@/components/Workflow/EnhancedStatusBadge';
 import { WhatsNext } from '@/components/Workflow/WhatsNext';
@@ -102,10 +103,17 @@ export const BidDetails = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const bid = data?.data;
+  
+  // Fetch RFQ to check ownership
+  const { data: rfqData } = useRFQ(bid?.rfqId);
+  const rfq = rfqData?.data;
+  
+  // Check if user is RFQ owner (can evaluate bids) - define early for use in queries
+  const isRFQOwner = rfq && user?.companyId === rfq.companyId;
 
-  // Fetch other bids for the same RFQ for comparison (only for buyers)
+  // Fetch other bids for the same RFQ for comparison (only for RFQ owners)
   const { data: otherBidsData } = useBidsByRFQ(
-    isBuyer && bid?.rfqId ? bid.rfqId : undefined,
+    (isBuyer || (role === Role.COMPANY_MANAGER && isRFQOwner)) && bid?.rfqId ? bid.rfqId : undefined,
     { status: 'submitted' }
   );
   const otherBids = otherBidsData?.data || [];
@@ -128,12 +136,14 @@ export const BidDetails = () => {
 
   const relatedContract = contractsData && contractsData.length > 0 ? contractsData[0] : null;
   const isBidOwner = user?.companyId === bid?.companyId;
-  const canRevealIdentity = bid?.anonymousBidder && (isBuyer || isAdmin || isBidOwner);
+  // Allow Buyer, Company Manager (if RFQ owner), Admin, or Government to evaluate
+  const canEvaluate = (isBuyer || isAdmin || (role === Role.COMPANY_MANAGER && isRFQOwner)) && 
+                      (bid?.status === BidStatus.SUBMITTED || bid?.status === BidStatus.UNDER_REVIEW);
+  const canRevealIdentity = bid?.anonymousBidder && (isBuyer || isAdmin || isBidOwner || isRFQOwner);
   const canWithdraw = bid?.status === BidStatus.SUBMITTED && isProvider && isBidOwner;
-  const canEvaluate = (isBuyer || isAdmin) && (bid?.status === BidStatus.SUBMITTED || bid?.status === BidStatus.UNDER_REVIEW);
   const canEdit = isProvider && isBidOwner && (bid?.status === BidStatus.DRAFT || bid?.status === BidStatus.SUBMITTED);
   const canDelete = isProvider && isBidOwner && bid?.status === BidStatus.DRAFT;
-  const canCompare = isBuyer && bid?.rfqId; // Only buyers can compare bids, and RFQ ID must exist
+  const canCompare = (isBuyer || (role === Role.COMPANY_MANAGER && isRFQOwner)) && bid?.rfqId; // RFQ owners can compare bids
 
   if (isLoading) {
     return <PageSkeleton />;
@@ -322,7 +332,7 @@ export const BidDetails = () => {
       />
 
       {/* Legacy Workflow Next Steps - Keep for backward compatibility */}
-      {bid.status === BidStatus.ACCEPTED && isBuyer && (
+      {bid.status === BidStatus.ACCEPTED && (isBuyer || (role === Role.COMPANY_MANAGER && isRFQOwner)) && (
         <WorkflowNextSteps
           title="Next Steps: Create Contract"
           steps={[
