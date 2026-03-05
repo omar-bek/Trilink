@@ -190,9 +190,12 @@ export class BidController {
 
       const { id } = req.params;
       const data: UpdateBidDto = req.body;
+      const requesterRole = req.user.role as Role;
       const requesterCompanyId = 
-        req.user.role === Role.ADMIN ? undefined : req.user.companyId;
-      const bid = await this.service.updateBid(id, data, requesterCompanyId);
+        requesterRole === Role.ADMIN || requesterRole === Role.GOVERNMENT 
+          ? undefined 
+          : req.user.companyId;
+      const bid = await this.service.updateBid(id, data, requesterCompanyId, requesterRole);
 
       const response: ApiResponse = {
         success: true,
@@ -222,9 +225,12 @@ export class BidController {
       }
 
       const { id } = req.params;
+      const requesterRole = req.user.role as Role;
       const requesterCompanyId = 
-        req.user.role === Role.ADMIN ? undefined : req.user.companyId;
-      const bid = await this.service.withdrawBid(id, requesterCompanyId);
+        requesterRole === Role.ADMIN || requesterRole === Role.GOVERNMENT 
+          ? undefined 
+          : req.user.companyId;
+      const bid = await this.service.withdrawBid(id, requesterCompanyId, requesterRole);
 
       const response: ApiResponse = {
         success: true,
@@ -254,9 +260,12 @@ export class BidController {
 
       const { id } = req.params;
       const data: EvaluateBidDto = req.body;
+      const requesterRole = req.user.role as Role;
       const requesterCompanyId = 
-        req.user.role === Role.ADMIN ? undefined : req.user.companyId;
-      const bid = await this.service.evaluateBid(id, data, requesterCompanyId);
+        requesterRole === Role.ADMIN || requesterRole === Role.GOVERNMENT 
+          ? undefined 
+          : req.user.companyId;
+      const bid = await this.service.evaluateBid(id, data, requesterCompanyId, requesterRole);
 
       const response: ApiResponse = {
         success: true,

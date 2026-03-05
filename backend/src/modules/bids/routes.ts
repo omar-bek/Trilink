@@ -171,7 +171,7 @@ router.post(
 router.post(
   '/:id/evaluate',
   authenticate,
-  requireRole(Role.BUYER), // Only Buyer can evaluate bids
+  requireRole(Role.BUYER, Role.ADMIN, Role.GOVERNMENT), // Buyer, Admin, and Government can evaluate bids
   requirePermission(Permission.EVALUATE_BID),
   validate(evaluateBidSchema),
   controller.evaluateBid

@@ -102,12 +102,13 @@ export const EditBid = () => {
 
   // Check if user can edit this bid
   const isProvider = role !== Role.BUYER && role !== Role.ADMIN && role !== Role.GOVERNMENT;
-  const canEdit = isProvider && (bid.status === BidStatus.DRAFT || bid.status === BidStatus.SUBMITTED);
+  const isBidOwner = user?.companyId === bid?.companyId;
+  const canEdit = isProvider && isBidOwner && (bid.status === BidStatus.DRAFT || bid.status === BidStatus.SUBMITTED);
 
   if (!canEdit) {
     return (
       <Alert severity="error">
-        You cannot edit this bid. Only draft or submitted bids can be edited by the provider.
+        You cannot edit this bid. Only the bid owner can edit draft or submitted bids.
       </Alert>
     );
   }

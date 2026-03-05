@@ -487,20 +487,27 @@ export class BidService {
   /**
    * Update bid
    * Status lifecycle: Only draft or submitted bids can be updated
+   * Only bid owner (company) can update their bids, unless admin
    */
   async updateBid(
     id: string,
     data: UpdateBidDto,
-    requesterCompanyId?: string
+    requesterCompanyId?: string,
+    requesterRole?: Role
   ): Promise<BidResponse> {
     const bid = await this.repository.findById(id);
     if (!bid) {
       throw new AppError('Bid not found', 404);
     }
 
-    // Enforce company isolation
-    if (requesterCompanyId && bid.companyId.toString() !== requesterCompanyId) {
-      throw new AppError('Access denied: Bid belongs to different company', 403);
+    // Enforce company isolation: Only bid owner can update, unless admin/government
+    if (requesterRole !== Role.ADMIN && requesterRole !== Role.GOVERNMENT) {
+      if (!requesterCompanyId) {
+        throw new AppError('Access denied: Company ID is required', 403);
+      }
+      if (bid.companyId.toString() !== requesterCompanyId) {
+        throw new AppError('Access denied: You can only update bids from your own company', 403);
+      }
     }
 
     // Status lifecycle: Only draft or submitted bids can be updated
@@ -554,19 +561,26 @@ export class BidService {
   /**
    * Withdraw bid
    * Status lifecycle: Only submitted bids can be withdrawn
+   * Only bid owner (company) can withdraw their bids, unless admin
    */
   async withdrawBid(
     id: string,
-    requesterCompanyId?: string
+    requesterCompanyId?: string,
+    requesterRole?: Role
   ): Promise<BidResponse> {
     const bid = await this.repository.findById(id);
     if (!bid) {
       throw new AppError('Bid not found', 404);
     }
 
-    // Enforce company isolation
-    if (requesterCompanyId && bid.companyId.toString() !== requesterCompanyId) {
-      throw new AppError('Access denied: Bid belongs to different company', 403);
+    // Enforce company isolation: Only bid owner can withdraw, unless admin/government
+    if (requesterRole !== Role.ADMIN && requesterRole !== Role.GOVERNMENT) {
+      if (!requesterCompanyId) {
+        throw new AppError('Access denied: Company ID is required', 403);
+      }
+      if (bid.companyId.toString() !== requesterCompanyId) {
+        throw new AppError('Access denied: You can only withdraw bids from your own company', 403);
+      }
     }
 
     // Status lifecycle: Only submitted bids can be withdrawn
@@ -665,21 +679,31 @@ export class BidService {
    * Evaluate bid (accept/reject)
    * Status lifecycle: Only submitted or under_review bids can be evaluated
    * Auto-generates contract when bid is accepted
+   * Only RFQ owner (buyer) or admin/government can evaluate bids
    */
-  async evaluateBid(id: string, data: EvaluateBidDto, requesterCompanyId?: string): Promise<BidResponse> {
+  async evaluateBid(
+    id: string, 
+    data: EvaluateBidDto, 
+    requesterCompanyId?: string,
+    requesterRole?: Role
+  ): Promise<BidResponse> {
     const bid = await this.repository.findById(id);
     if (!bid) {
       throw new AppError('Bid not found', 404);
     }
 
-    // Authorization: Only RFQ owner (buyer) or admin can evaluate bids
-    if (requesterCompanyId) {
-      const rfqRepository = new RFQRepository();
-      const rfq = await rfqRepository.findById(bid.rfqId.toString());
-      if (!rfq) {
-        throw new AppError('RFQ not found', 404);
-      }
+    // Authorization: Only RFQ owner (buyer) or admin/government can evaluate bids
+    const rfqRepository = new RFQRepository();
+    const rfq = await rfqRepository.findById(bid.rfqId.toString());
+    if (!rfq) {
+      throw new AppError('RFQ not found', 404);
+    }
 
+    // Admin and Government can evaluate any bid
+    if (requesterRole !== Role.ADMIN && requesterRole !== Role.GOVERNMENT) {
+      if (!requesterCompanyId) {
+        throw new AppError('Access denied: Company ID is required', 403);
+      }
       // Check if requester is the RFQ owner (buyer)
       if (rfq.companyId.toString() !== requesterCompanyId) {
         throw new AppError('Access denied: Only the RFQ owner (buyer) can evaluate bids', 403);

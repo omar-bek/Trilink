@@ -16,7 +16,7 @@ import { AIExplanationSummary } from '@/components/Bid/AIExplanationSummary';
 import { formatCurrency, formatDate } from '@/utils';
 import { PageSkeleton } from '@/components/LoadingSkeleton/LoadingSkeleton';
 import { ResponsiveTable, ResponsiveTableColumn } from '@/components/common';
-import { Bid } from '@/types/bid';
+import { Bid, BidStatus } from '@/types/bid';
 import { convertAIScoreMetadata, convertBreakdown } from '@/utils/bidHelpers';
 
 export const BidComparison = () => {
@@ -24,9 +24,17 @@ export const BidComparison = () => {
   const navigate = useNavigate();
 
   const { data: rfqData } = useRFQ(rfqId);
-  const { data: bidsData, isLoading } = useBidsByRFQ(rfqId, { status: 'submitted' });
+  // Fetch all bids (submitted, accepted, under_review) for comparison
+  const { data: bidsData, isLoading } = useBidsByRFQ(rfqId);
   const bids = bidsData?.data || [];
   const rfq = rfqData?.data;
+
+  // Filter to show only relevant bids (submitted, accepted, under_review) - exclude withdrawn and rejected
+  const relevantBids = bids.filter((bid) =>
+    bid.status === BidStatus.SUBMITTED ||
+    bid.status === BidStatus.ACCEPTED ||
+    bid.status === BidStatus.UNDER_REVIEW
+  );
 
   if (isLoading) {
     return <PageSkeleton />;
@@ -41,7 +49,7 @@ export const BidComparison = () => {
   }
 
   // Filter out bids without valid IDs first
-  const validBids = bids.filter((bid) => {
+  const validBids = relevantBids.filter((bid) => {
     const bidId = bid._id || bid.id;
     if (!bidId) {
       console.warn('Bid missing ID, filtering out:', bid);
@@ -208,8 +216,8 @@ export const BidComparison = () => {
       {sortedBids.some((bid) => bid.aiScoreMetadata) && (
         <Alert severity="info" sx={{ mb: 3 }}>
           <Typography variant="body2">
-            <strong>AI Scoring Transparency:</strong> All bids with AI scores include full explainability. 
-            Click the <strong>"Why?"</strong> button or help icon next to any AI score to view detailed explanations, 
+            <strong>AI Scoring Transparency:</strong> All bids with AI scores include full explainability.
+            Click the <strong>"Why?"</strong> button or help icon next to any AI score to view detailed explanations,
             confidence levels, risk assessments, and model version information. All AI decisions are audit-safe and legally explainable.
           </Typography>
         </Alert>
@@ -226,7 +234,7 @@ export const BidComparison = () => {
           }
           return String(bidId);
         }}
-        emptyMessage="No submitted bids found for this RFQ."
+        emptyMessage="No bids found for this RFQ. Bids must be submitted, accepted, or under review to appear in comparison."
         onRowClick={(bid) => {
           const bidId = bid._id || bid.id;
           if (!bidId) {
@@ -257,19 +265,19 @@ export const BidComparison = () => {
                   <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
                     Bid #{typeof bidId === 'string' ? bidId.slice(-6) : String(bidId).slice(-6)} - AI Explanation
                   </Typography>
-                <AIExplanationSummary
-                  totalScore={bid.aiScoreMetadata!.totalScore}
-                  breakdown={convertBreakdown(bid.aiScoreMetadata!.breakdown)}
-                  overallConfidence={convertAIScoreMetadata(bid.aiScoreMetadata!)!.overallConfidence}
-                  overallRisk={convertAIScoreMetadata(bid.aiScoreMetadata!)!.overallRisk}
-                  recommendation={bid.aiScoreMetadata!.recommendation}
-                  timestamp={bid.aiScoreMetadata!.timestamp ? new Date(bid.aiScoreMetadata!.timestamp) : undefined}
-                  modelVersion={bid.aiScoreMetadata!.modelVersion}
-                  variant="standard"
-                  showDisclaimer={true}
-                  showModelInfo={true}
-                />
-              </Box>
+                  <AIExplanationSummary
+                    totalScore={bid.aiScoreMetadata!.totalScore}
+                    breakdown={convertBreakdown(bid.aiScoreMetadata!.breakdown)}
+                    overallConfidence={convertAIScoreMetadata(bid.aiScoreMetadata!)!.overallConfidence}
+                    overallRisk={convertAIScoreMetadata(bid.aiScoreMetadata!)!.overallRisk}
+                    recommendation={bid.aiScoreMetadata!.recommendation}
+                    timestamp={bid.aiScoreMetadata!.timestamp ? new Date(bid.aiScoreMetadata!.timestamp) : undefined}
+                    modelVersion={bid.aiScoreMetadata!.modelVersion}
+                    variant="standard"
+                    showDisclaimer={true}
+                    showModelInfo={true}
+                  />
+                </Box>
               );
             })}
         </Box>

@@ -75,7 +75,7 @@ export const LandingPage = () => {
     {
       icon: <SecurityIcon sx={{ fontSize: 48 }} />,
       title: 'Secure & Compliant',
-      description: 'Government-grade security with role-based access control, audit trails, and compliance monitoring.',
+      description: 'Enterprise-grade security with role-based access control, audit trails, and compliance monitoring.',
       color: colors.intelligence.ceruleanLight,
     },
     {
@@ -138,7 +138,7 @@ export const LandingPage = () => {
         <Fade in={isVisible} timeout={1000}>
           <Box sx={{ textAlign: 'center', mb: 10 }}>
             <Chip
-              label="Government-Grade Platform"
+              label="Enterprise-Grade Platform"
               sx={{
                 mb: 3,
                 px: 2,
@@ -197,7 +197,7 @@ export const LandingPage = () => {
                 lineHeight: typo.lineHeight.relaxed,
               }}
             >
-              Streamline procurement processes, manage contracts, track shipments in real-time, and gain actionable insights with our comprehensive B2B platform designed for government and enterprise use.
+              Streamline procurement processes, manage contracts, track shipments in real-time, and gain actionable insights with our comprehensive B2B platform designed for enterprise use.
             </Typography>
             <Stack 
               direction={{ xs: 'column', sm: 'row' }} 

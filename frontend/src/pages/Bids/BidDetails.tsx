@@ -129,10 +129,10 @@ export const BidDetails = () => {
   const relatedContract = contractsData && contractsData.length > 0 ? contractsData[0] : null;
   const isBidOwner = user?.companyId === bid?.companyId;
   const canRevealIdentity = bid?.anonymousBidder && (isBuyer || isAdmin || isBidOwner);
-  const canWithdraw = bid?.status === BidStatus.SUBMITTED && isProvider;
-  const canEvaluate = isBuyer && (bid?.status === BidStatus.SUBMITTED || bid?.status === BidStatus.UNDER_REVIEW);
-  const canEdit = isProvider && (bid?.status === BidStatus.DRAFT || bid?.status === BidStatus.SUBMITTED);
-  const canDelete = isProvider && bid?.status === BidStatus.DRAFT;
+  const canWithdraw = bid?.status === BidStatus.SUBMITTED && isProvider && isBidOwner;
+  const canEvaluate = (isBuyer || isAdmin) && (bid?.status === BidStatus.SUBMITTED || bid?.status === BidStatus.UNDER_REVIEW);
+  const canEdit = isProvider && isBidOwner && (bid?.status === BidStatus.DRAFT || bid?.status === BidStatus.SUBMITTED);
+  const canDelete = isProvider && isBidOwner && bid?.status === BidStatus.DRAFT;
   const canCompare = isBuyer && bid?.rfqId; // Only buyers can compare bids, and RFQ ID must exist
 
   if (isLoading) {
